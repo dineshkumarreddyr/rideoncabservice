@@ -1,0 +1,220 @@
+Deployement steps
+
+Title : Get user data by user id
+URL : {base_url}/user/{user_id}
+Method : GET
+Response : {"uid":"1","fname":"uday","lname":"kumar","email":"udayakumarswamy@gmail.com","city":"Hyd","state":"AP","mobile":"7569508595","address1":null,"address2":null,"pincode":null}
+
+-----------------------------------------------------------------------------------------------------
+Title : User signup
+URL : {base_url}/user/signup
+Method : POST
+Request : {
+    "fname": "uday",
+    "lname": "kumar",
+    "email": "udayakumarswamy@gmail.com",
+    "city": "hyd",
+    "state": "AP",
+    "mobile": "7569508595",
+    "password": "123456"
+}
+
+1.
+Status code : 400
+Response :
+{"error":"validation","fields":{"fname":"First required","lname":"Last required","email":"Email required","city":"City required","state":"State required","mobile":"Mobile required","password":"Password required"}}
+
+2.
+Status code : 400
+Response :
+{"error":"validation","fields":{"fname":"First required"}}
+
+3.
+Status code : 409
+Response :
+{"error":"duplicate","error_description":"This email already exists"}
+
+4.
+Status code : 409
+Response :
+{"error":"Invalid JSON","error_description":"Invalid JSON"}
+
+5.
+Status code : 201
+Response :
+{"rocuserid":"5","rocuserfirstname":"uday","rocuserlastname":"kumar","rocuseremail":"udayakumarswamy3@gmail.com","rocusercity":"hyd","rocuserstate":"AP","rocusermobile":"7569508595","rocuseraddress1":null,"rocusersaddress2":null,"rocuserpincode":null}
+
+6.
+Status code : 200
+Response :
+{"error":{"message":SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'rocuserfirstname' cannot be null}}
+
+------------------------------------------------------------------------------------------------------------
+Title : User Login
+URL : {base_url}/user/login
+Method : POST
+Request : {
+    "username": "uday",
+    "password": "123456"
+}
+
+1.
+Status code : 400
+Response :
+{"error":"validation","fields":{"username":"username required","password":"password required"}}
+
+2.
+Status code : 400
+Response :
+{"error":"validation","fields":{"username":"Username should not be empty","password":"Password should not be empty"}}
+
+3.
+Status code : 401
+Response :
+{"error":"Invalid","error_description":"Invalid username or password"}
+
+4.
+Status code : 200
+Response :
+{"uid":"1","fname":"uday","lname":"kumar","email":"udayakumarswamy@gmail.com","city":"Hyd","state":"AP","mobile":"7569508595","address1":null,"address2":null,"pincode":null}
+------------------------------------------------------------------------------------------------------------
+
+Title : Search
+URL : {base_url}/search
+Method : POST
+Request : {
+    "cabtype": "MINI"
+}
+
+1.
+Status code : 400
+Response :
+{
+    "error": "validation",
+    "fields": {
+        "cabtype": "Cab type required"
+    }
+}
+
+2.
+Status code : 400
+Response :
+{
+    "error": "validation",
+    "fields": {
+        "cabtype": "Cab type should not be empty"
+    }
+}
+
+3.
+Status code : 200
+Response :
+{
+    "total": 0,
+    "results": []
+}
+------------------------------------------------------------------------------------------------------------
+
+Title : Cab booking
+URL : {base_url}/bookcab
+Method : POST
+Request : 
+{
+  "servicetype": "MINI",
+  "servicename": "OLA",
+  "servicechargeperkm":"10",
+  "servicekm": "2",
+  "servicestimatedrs": "150",
+  "bookingfromlocation": "Hitech",
+  "bookingtolocation": "Jublee",
+  "serviceclass": "MINI",
+  "userid": "1",
+  "bookingdatetime": "10-10-2015",
+  "vendorid": "1",
+  "bookingstatus": "book"
+}
+
+1.
+Status code : 400
+Response :
+{
+    "error": "validation",
+    "fields": {
+        "servicetype": "Service type required"
+    }
+}
+
+2.
+Status code : 400
+Response :
+{
+    "error": "validation",
+    "fields": {
+        "servicetype": "Service type should not be empty"
+    }
+}
+
+3.
+Status code : 201
+Response :
+30
+
+4. 
+Status code : 200
+Response : {"error":{"message":"SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry '' for key 'roctransactionid_UNIQUE'"}}
+-----------------------------------------------------------------------------------------------------
+Title : Vendor signup
+URL : {base_url}/vendor/signup
+Method : POST
+Request : {
+    "fname": "uday",
+    "lname": "kumar",
+    "email": "udayakumarswamy@gmail.com",
+    "city": "hyd",
+    "state": "AP",
+    "mobile": "7569508595",
+    "password": "123456"
+}
+
+1.
+Status code : 400
+Response :
+{
+    "error": "validation",
+    "fields": {
+        "name": "Name required",
+        "address": "Address required",
+        "email": "Email required",
+        "number1": "Number1 required",
+        "number2": "Number2 required",
+        "username": "Username required",
+        "password": "Password required",
+        "contactperson": "Contact person required",
+        "logo": "Logo required"
+    }
+}
+
+2.
+Status code : 400
+Response :
+{"error":"validation","fields":{"name":"Name required"}}
+
+3.
+Status code : 409
+Response :
+{"error":"duplicate","error_description":"This email already exists"}
+
+4.
+Status code : 409
+Response :
+{"error":"Invalid JSON","error_description":"Invalid JSON"}
+
+5.
+Status code : 201
+Response :
+{"vid":"7","name":"Aneel","address":"vanalasti","email":"aneel1@gmail.com","number1":"Number1 required","number2":"Number2 required","username":"Username required","contactperson":"Contact person required","logo":"Logo required"}
+
+6.
+Status code : 200
+Response :
+{"error":{"message":SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'rocuserfirstname' cannot be null}}

@@ -3,7 +3,7 @@
  * Getting user data by user ID
  */
 function user_data($rocuserid) {
-	$sql = "SELECT rocuserid, rocuserfirstname, rocuserlastname, rocuseremail, rocusercity, rocuserstate, rocusermobile, rocuseraddress1, rocusersaddress2, rocuserpincode FROM rocusers WHERE  rocuserid = :rocuserid";
+	$sql = "SELECT rocuserid as uid, rocuserfirstname as fname, rocuserlastname as lname, rocuseremail as email, rocusercity as city, rocuserstate as state, rocusermobile as mobile, rocuseraddress1 as address1, rocusersaddress2 as address2, rocuserpincode as pincode FROM rocusers WHERE  rocuserid = :rocuserid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
@@ -15,7 +15,7 @@ function user_data($rocuserid) {
 		
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		return '{"error":{"text":'. $e->getMessage() .'}}'; 
+		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
 	}
 }
 /*
@@ -28,13 +28,13 @@ function user_signUp($signUpData) {
 		try {
 			$db = getDB();
 			$stmt = $db->prepare($sql);  
-			$stmt->bindParam(":rocuserfirstname", $signUpData->rocuserfirstname);
-			$stmt->bindParam(":rocuserlastname", $signUpData->rocuserlastname);
-			$stmt->bindParam(":rocuseremail", $signUpData->rocuseremail);
-			$stmt->bindParam(":rocusercity", $signUpData->rocusercity);
-			$stmt->bindParam(":rocuserstate", $signUpData->rocuserstate);
-			$stmt->bindParam(":rocusermobile", $signUpData->rocusermobile);
-			$stmt->bindParam(":rocuserpassword", $signUpData->rocuserpassword);
+			$stmt->bindParam(":rocuserfirstname", $signUpData->fname);
+			$stmt->bindParam(":rocuserlastname", $signUpData->lname);
+			$stmt->bindParam(":rocuseremail", $signUpData->email);
+			$stmt->bindParam(":rocusercity", $signUpData->city);
+			$stmt->bindParam(":rocuserstate", $signUpData->state);
+			$stmt->bindParam(":rocusermobile", $signUpData->mobile);
+			$stmt->bindParam(":rocuserpassword", $signUpData->password);
 
 			$stmt->execute();
 			$signUpData->id = $db->lastInsertId();
@@ -44,13 +44,34 @@ function user_signUp($signUpData) {
 			return user_data($signUpData_id);
 		} catch(PDOException $e) {
 			//error_log($e->getMessage(), 3, '/var/tmp/php.log');
-			return '{"error":{"text":'. $e->getMessage() .'}}'; 
+			return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
 		}
 	}
 	else {
-		$status_data = array("error" => TRUE, "erro_description" => "This email already exists");
+		$status_data = array("error" => "duplicate", "error_description" => "This email already exists");
 		return json_encode($status_data);
 	}
+}
+
+function user_signup_validate($signUpData) {
+	$signUpData = json_decode($signUpData);
+	$fields = array();
+	$error = FALSE;
+	// return $signUpData->fname;
+	if(v::string()->notEmpty()->validate($signUpData->fname)) {
+		$fields['fname'] = "First name should not be empty";
+		$error = TRUE;
+	}
+	// if($error) {
+	// 	$response = array(
+	// 		'error' => 'validation',
+	// 		'fields' => $fields
+	// 	);
+	// 	return json_encode($response);
+	// }
+	// else {
+	// 	return TRUE;
+	// }
 }
 /*
  * User Sign up check "is user already registered or not"
@@ -61,7 +82,7 @@ function signUpCheck($signUpData) {
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
-		$stmt->bindParam("rocuseremail", $signUpData->rocuseremail);
+		$stmt->bindParam("rocuseremail", $signUpData->email);
 		$stmt->execute();
 		$user_data = $stmt->rowCount(PDO::FETCH_OBJ);
 		$db = null;
@@ -69,7 +90,7 @@ function signUpCheck($signUpData) {
 		
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		return '{"error":{"text":'. $e->getMessage() .'}}'; 
+		return '{"error":{"text":"'. $e->getMessage() .'"}}'; 
 	}
 	
 }
@@ -82,8 +103,8 @@ function user_login($loginData) {
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql);  
-		$stmt->bindParam(":rocuseremail", $loginData->rocuseremail);
-		$stmt->bindParam(":rocuserpassword", $loginData->rocuserpassword);
+		$stmt->bindParam(":rocuseremail", $loginData->username);
+		$stmt->bindParam(":rocuserpassword", $loginData->password);
 		$stmt->execute();
 		$user_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
@@ -92,12 +113,12 @@ function user_login($loginData) {
 			return user_data($user_data[0]->rocuserid);
 		}
 		else {
-			$status_data = array("error" => TRUE, "erro_description" => "Invalid username or password");
+			$status_data = array("error" => "Invalid", "error_description" => "Invalid username or password");
 			return json_encode($status_data);
 		}
 	} catch(PDOException $e) {
 		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		return '{"error":{"text":'. $e->getMessage() .'}}'; 
+		return '{"error":{"text":"'. $e->getMessage() .'"}}'; 
 	}
 }
 ?>

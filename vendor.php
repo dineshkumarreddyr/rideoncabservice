@@ -4,24 +4,26 @@
  */
 function search($search) {
 	$search = json_decode($search);
-	$sql = "SELECT vc.roccabtype, vc.roccabmodel, vc.rocchargeperkm, v.rocvendorid, v.rocvendorname, v.rocvendoraddress, v.rocvendorlogo, v.rocvendorrating FROM rocvendorcharges vc, rocvendors v WHERE vc.rocvendorid = v.rocvendorid AND vc.roccabtype = :roccabtype";
+	$sql = "SELECT vc.roccabtype as cabtype, vc.roccabmodel as cabmodel, vc.rocchargeperkm as chargeperkm, v.rocvendorid as vendorid, v.rocvendorname as vendorname, v.rocvendoraddress as vendoraddress, v.rocvendorlogo as vendorlogo, v.rocvendorrating as vendorrating FROM rocvendorcharges vc, rocvendors v WHERE vc.rocvendorid = v.rocvendorid AND vc.roccabtype = :roccabtype";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
-		$stmt->bindParam("roccabtype", $search->roccabtype);
+		$stmt->bindParam("roccabtype", $search->cabtype);
 		$stmt->execute();
 		$search_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
-		if(count($search_data)) {
+		$count = count($search_data);
+		if($count) {
+			$search_data = array("total" => $count, "results" => $search_data);
 			return json_encode($search_data);
 		}
 		else {
-			$search_data = array("error" => TRUE, "erro_description" => "No results found");
+			$search_data = array("total" => 0, "results" => array());
 			return json_encode($search_data);
 		}
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		return '{"error":{"text":'. $e->getMessage() .'}}'; 
+		return '{"error":{"text":"'. $e->getMessage() .'""}}'; 
 	}
 }
 /*
@@ -34,18 +36,18 @@ function bookCab($bookingData) {
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql);  
-		$stmt->bindParam(":rocservicetype", $bookingData->rocservicetype);
-		$stmt->bindParam(":rocservicename", $bookingData->rocservicename);
-		$stmt->bindParam(":rocservicechargeperkm", $bookingData->rocservicechargeperkm);
-		$stmt->bindParam(":rocservicekm", $bookingData->rocservicekm);
-		$stmt->bindParam(":rocservicestimatedrs", $bookingData->rocservicestimatedrs);
-		$stmt->bindParam(":rocbookingfromlocation", $bookingData->rocbookingfromlocation);
-		$stmt->bindParam(":rocbookingtolocation", $bookingData->rocbookingtolocation);
-		$stmt->bindParam(":rocserviceclass", $bookingData->rocserviceclass);
-		$stmt->bindParam(":rocuserid", $bookingData->rocuserid);
-		$stmt->bindParam(":rocbookingdatetime", $bookingData->rocbookingdatetime);
-		$stmt->bindParam(":rocvendorid", $bookingData->rocvendorid);
-		$stmt->bindParam(":rocbookingstatus", $bookingData->rocbookingstatus);
+		$stmt->bindParam(":rocservicetype", $bookingData->servicetype);
+		$stmt->bindParam(":rocservicename", $bookingData->servicename);
+		$stmt->bindParam(":rocservicechargeperkm", $bookingData->servicechargeperkm);
+		$stmt->bindParam(":rocservicekm", $bookingData->servicekm);
+		$stmt->bindParam(":rocservicestimatedrs", $bookingData->servicestimatedrs);
+		$stmt->bindParam(":rocbookingfromlocation", $bookingData->bookingfromlocation);
+		$stmt->bindParam(":rocbookingtolocation", $bookingData->bookingtolocation);
+		$stmt->bindParam(":rocserviceclass", $bookingData->serviceclass);
+		$stmt->bindParam(":rocuserid", $bookingData->userid);
+		$stmt->bindParam(":rocbookingdatetime", $bookingData->bookingdatetime);
+		$stmt->bindParam(":rocvendorid", $bookingData->vendorid);
+		$stmt->bindParam(":rocbookingstatus", $bookingData->bookingstatus);
 
 		$stmt->execute();
 		$bookingData->id = $db->lastInsertId();
@@ -54,7 +56,7 @@ function bookCab($bookingData) {
 		return $bookingData_id;
 	} catch(PDOException $e) {
 		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		return '{"error":{"text":'. $e->getMessage() .'}}'; 
+		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
 	}
 }
 /*
@@ -67,15 +69,15 @@ function vendor_signUp($signUpData) {
 		try {
 			$db = getDB();
 			$stmt = $db->prepare($sql);  
-			$stmt->bindParam(":rocvendorname", $signUpData->rocvendorname);
-			$stmt->bindParam(":rocvendoraddress", $signUpData->rocvendoraddress);
-			$stmt->bindParam(":rocvendoremail", $signUpData->rocvendoremail);
-			$stmt->bindParam(":rocvendornumber1", $signUpData->rocvendornumber1);
-			$stmt->bindParam(":rocvendornumber2", $signUpData->rocvendornumber2);
-			$stmt->bindParam(":rocvendorusername", $signUpData->rocvendorusername);
-			$stmt->bindParam(":rocvendorpassword", $signUpData->rocvendorpassword);
-			$stmt->bindParam(":rocvendorcontactperson", $signUpData->rocvendorcontactperson);
-			$stmt->bindParam(":rocvendorlogo", $signUpData->rocvendorlogo);
+			$stmt->bindParam(":rocvendorname", $signUpData->name);
+			$stmt->bindParam(":rocvendoraddress", $signUpData->address);
+			$stmt->bindParam(":rocvendoremail", $signUpData->email);
+			$stmt->bindParam(":rocvendornumber1", $signUpData->number1);
+			$stmt->bindParam(":rocvendornumber2", $signUpData->number2);
+			$stmt->bindParam(":rocvendorusername", $signUpData->username);
+			$stmt->bindParam(":rocvendorpassword", $signUpData->password);
+			$stmt->bindParam(":rocvendorcontactperson", $signUpData->contactperson);
+			$stmt->bindParam(":rocvendorlogo", $signUpData->logo);
 
 			$stmt->execute();
 			$signUpData->id = $db->lastInsertId();
@@ -85,11 +87,11 @@ function vendor_signUp($signUpData) {
 			return vendor_data($signUpData_id);
 		} catch(PDOException $e) {
 			//error_log($e->getMessage(), 3, '/var/tmp/php.log');
-			return '{"error":{"text":'. $e->getMessage() .'}}'; 
+			return '{"error":{"text":"'. $e->getMessage() .'"}}'; 
 		}
 	}
 	else {
-		$status_data = array("error" => TRUE, "erro_description" => "This email already exists");
+		$status_data = array("error" => "duplicate", "erro_description" => "This email already exists");
 		return json_encode($status_data);
 	}
 }
@@ -102,7 +104,7 @@ function vendor_signUpCheck($signUpData) {
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
-		$stmt->bindParam("rocvendoremail", $signUpData->rocvendoremail);
+		$stmt->bindParam("rocvendoremail", $signUpData->email);
 		$stmt->execute();
 		$vendor_data = $stmt->rowCount(PDO::FETCH_OBJ);
 		$db = null;
@@ -110,7 +112,7 @@ function vendor_signUpCheck($signUpData) {
 		
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		return '{"error":{"text":'. $e->getMessage() .'}}'; 
+		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
 	}
 	
 }
@@ -118,7 +120,7 @@ function vendor_signUpCheck($signUpData) {
  * Getting vendor data by vendor unique ID
  */
 function vendor_data($rocvendorid) {
-	$sql = "SELECT rocvendorid, rocvendorname, rocvendoraddress, rocvendoremail, rocvendornumber1, rocvendornumber2, rocvendorusername, rocvendorpassword, rocvendorcontactperson, rocvendorlogo FROM rocvendors WHERE  rocvendorid = :rocvendorid";
+	$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendoraddress as address, rocvendoremail as email, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendorusername as username, rocvendorcontactperson as contactperson, rocvendorlogo as logo FROM rocvendors WHERE  rocvendorid = :rocvendorid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
@@ -130,7 +132,7 @@ function vendor_data($rocvendorid) {
 		
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		return '{"error":{"text":'. $e->getMessage() .'}}'; 
+		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
 	}
 }
 ?>
