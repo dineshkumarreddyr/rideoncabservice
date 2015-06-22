@@ -609,6 +609,250 @@ $app->post(
   }
 );
 
+// Vendor Login route
+$app->post(
+	'/vendor/login',
+	function () use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+			);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$request_data = json_decode($request_data);
+			$fields = array(); // error fields array creation
+			$error = FALSE; // validation error checking variable
+			// checking username is empty or not 
+			if(isset($request_data->username)) {
+				if(!v::string()->notEmpty()->validate($request_data->username)) {
+					$fields['username'] = "Username should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['username'] = "username required";
+				$error = TRUE;
+			}
+			// checking password is empty or not 
+			if(isset($request_data->password)) {
+				if(!v::string()->notEmpty()->validate($request_data->password)) {
+					$fields['password'] = "Password should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['password'] = "password required";
+				$error = TRUE;
+			}
+
+			// Checking is validation errors there
+			if($error) {
+				// If any validation errors
+				$response = array(
+					'error' => 'validation',
+					'fields' => $fields
+				);
+				$app->response->setStatus(400);
+				echo json_encode($response);
+			}
+			else {
+				// If no validation errors
+				$response_data = vendor_login($request->getBody());
+				$json_data = json_decode($response_data);
+	    	$vendor_data = $json_data;	// swapping first array object
+	    	echo json_encode($vendor_data);
+			}
+		}
+	}
+);
+
+// vendor services
+$app->post(
+	'/vendor/services',
+	function() use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+			);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$request_data = json_decode($request_data);
+			$fields = array(); // error fields array creation
+			$error = FALSE; // validation error checking variable
+			// checking vendor id is empty or not 
+			if(isset($request_data->vid)) {
+				if(!v::string()->notEmpty()->validate($request_data->vid)) {
+					$fields['vid'] = "Vendor id should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['vid'] = "Vendor id required";
+				$error = TRUE;
+			}
+			// checking services is empty or not 
+			if(empty($request_data->services)) {
+				$fields['services'] = "services required";
+				$error = TRUE;
+			}
+
+			// Checking is validation errors there
+			if($error) {
+				// If any validation errors
+				$response = array(
+					'error' => 'validation',
+					'fields' => $fields
+				);
+				$app->response->setStatus(400);
+				echo json_encode($response);
+			}
+			else {
+				// If no validation errors
+				echo $response_data = insert_vendorservices($request->getBody());
+			}
+		}
+	}
+);
+
+// GET Vendor Cab model by vendorid route
+$app->get(
+  '/vendor/cabmodel/:vendorid',
+  function ($vendorid) use ($app) {
+    $response_data = vendor_cabmodel_data($vendorid);
+    // checking is vendor id available or not
+    if($response_data == '[]') {
+    	// if user not aavailable with rocuserid throw 404
+    	$app->response->setStatus(404);
+    }
+    else {
+    	// if user available throw user data
+    	echo $response_data;
+    }
+  }
+);
+
+// vendor price
+$app->post(
+	'/vendor/prices',
+	function() use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+			);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$request_data = json_decode($request_data);
+			$fields = array(); // error fields array creation
+			$error = FALSE; // validation error checking variable
+			// checking vendor id is empty or not 
+			if(isset($request_data->vid)) {
+				if(!v::string()->notEmpty()->validate($request_data->vid)) {
+					$fields['vid'] = "Vendor id should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['vid'] = "Vendor id required";
+				$error = TRUE;
+			}
+			// checking prices is empty or not 
+			if(empty($request_data->prices)) {
+				$fields['prices'] = "prices required";
+				$error = TRUE;
+			}
+
+			// Checking is validation errors there
+			if($error) {
+				// If any validation errors
+				$response = array(
+					'error' => 'validation',
+					'fields' => $fields
+				);
+				$app->response->setStatus(400);
+				echo json_encode($response);
+			}
+			else {
+				// If no validation errors
+				echo $response_data = insert_vendorprices($request->getBody());
+			}
+		}
+	}
+);
+
+// vendor terms and conditions
+$app->post(
+	'/vendor/terms',
+	function() use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+			);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$request_data = json_decode($request_data);
+			$fields = array(); // error fields array creation
+			$error = FALSE; // validation error checking variable
+			// checking vendor id is empty or not 
+			if(isset($request_data->vid)) {
+				if(!v::string()->notEmpty()->validate($request_data->vid)) {
+					$fields['vid'] = "Vendor id should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['vid'] = "Vendor id required";
+				$error = TRUE;
+			}
+			// checking terms content is empty or not 
+			if(isset($request_data->content)) {
+				if(!v::string()->notEmpty()->validate($request_data->content)) {
+					$fields['content'] = "Content should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['content'] = "Content required";
+				$error = TRUE;
+			}
+
+			// Checking is validation errors there
+			if($error) {
+				// If any validation errors
+				$response = array(
+					'error' => 'validation',
+					'fields' => $fields
+				);
+				$app->response->setStatus(400);
+				echo json_encode($response);
+			}
+			else {
+				// If no validation errors
+				echo $response_data = insert_vendorterms($request->getBody());
+			}
+		}
+	}
+);
+
 $app->contentType('application/json');
 /**
  * Step 4: Run the Slim application

@@ -116,6 +116,35 @@ function vendor_signUpCheck($signUpData) {
 	}
 	
 }
+
+/*
+ * Vendor login by email and password and return vendor data
+ */
+function vendor_login($loginData) {
+	$loginData = json_decode($loginData);
+	$sql = "SELECT rocvendorid FROM rocvendors WHERE rocvendoremail = :rocvendoremail AND rocvendorpassword = :rocvendorpassword";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);  
+		$stmt->bindParam(":rocvendoremail", $loginData->username);
+		$stmt->bindParam(":rocvendorpassword", $loginData->password);
+		$stmt->execute();
+		$vendor_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		//return json_encode($vendor_data);
+		if(count($vendor_data)) {
+			return vendor_data($vendor_data[0]->rocvendorid);
+		}
+		else {
+			$status_data = array("error" => "Invalid", "error_description" => "Invalid username or password");
+			return json_encode($status_data);
+		}
+	} catch(PDOException $e) {
+		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"text":"'. $e->getMessage() .'"}}'; 
+	}
+}
+
 /*
  * Getting vendor data by vendor unique ID
  */
@@ -133,6 +162,161 @@ function vendor_data($rocvendorid) {
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
 		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+	}
+}
+
+/*
+ * insert vendor services
+ */
+function insert_vendorservices($vendorservices) {
+	$vendorservices = json_decode($vendorservices);
+	$vendor_id = $vendorservices->vid;
+	$services = $vendorservices->services;
+	foreach($services as $service) {
+		$error = FALSE;
+		// checking cab type is empty or not 
+		if(isset($service->cabtype)) {
+			if(empty($service->cabtype)) {
+				$error = TRUE;
+			}
+		}
+		else {
+			$error = TRUE;
+		}
+		// checking cab model is empty or not 
+		if(isset($service->cabmodel)) {
+			if(empty($service->cabmodel)) {
+				$error = TRUE;
+			}
+		}
+		else {
+			$error = TRUE;
+		}
+
+		// Checking is validation errors there
+		if(!$error) {
+			$sql = "INSERT INTO rocvendorcabmodel(rocvendorcabtype, rocvendorcabmodel, rocvendorid) VALUES(:rocvendorcabtype, :rocvendorcabmodel, :rocvendorid)";
+			try {
+				$db = getDB();
+				$stmt = $db->prepare($sql); 
+				$stmt->bindParam("rocvendorcabtype", $service->cabtype);
+				$stmt->bindParam("rocvendorcabmodel", $service->cabmodel);
+				$stmt->bindParam("rocvendorid", $vendor_id);
+				$stmt->execute();
+				$db = null;
+			} catch(PDOException $e) {
+				//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+				return '{"error":{"text":"'. $e->getMessage() .'""}}'; 
+				//break;
+			}
+		}
+	}
+	return 'Successfully updated';
+}
+
+function vendor_cabmodel_data($vendor_id) {
+	$sql = "SELECT rocvendorcabmodelid as vcmid, rocvendorcabmodel as vcm FROM rocvendorcabmodel WHERE  rocvendorid = :rocvendorid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->bindParam("rocvendorid", $vendor_id);
+		$stmt->execute();		
+		$vendor_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		$count = count($vendor_data);
+		if($count) {
+			$vendor_data = array("total" => $count, "results" => $vendor_data);
+			return json_encode($vendor_data);
+		}
+		else {
+			$vendor_data = array("total" => 0, "results" => array());
+			return json_encode($vendor_data);
+		}
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+	}
+}
+
+/*
+ * insert vendor services
+ */
+function insert_vendorprices($vendorprices) {
+	$vendorprices = json_decode($vendorprices);
+	$vendor_id = $vendorprices->vid;
+	$prices = $vendorprices->prices;
+	foreach($prices as $price) {
+		$error = FALSE;
+		// checking cab model id is empty or not 
+		if(isset($price->vcmid)) {
+			if(empty($price->vcmid)) {
+				$error = TRUE;
+			}
+		}
+		else {
+			$error = TRUE;
+		}
+		// checking charge per km is empty or not 
+		if(isset($price->cpkm)) {
+			if(empty($price->cpkm)) {
+				$error = TRUE;
+			}
+		}
+		else {
+			$error = TRUE;
+		}
+		// checking cab service id is empty or not 
+		if(isset($price->csid)) {
+			if(empty($price->csid)) {
+				$error = TRUE;
+			}
+		}
+		else {
+			$error = TRUE;
+		}
+
+		// Checking is validation errors there
+		if(!$error) {
+			$sql = "INSERT INTO rocvendorcharges(roccabmodelid, rocchargeperkm, roccabservicesid, rocvendorid) VALUES(:roccabmodelid, :rocchargeperkm, :roccabservicesid, :rocvendorid)";
+			try {
+				$db = getDB();
+				$stmt = $db->prepare($sql); 
+				$stmt->bindParam("roccabmodelid", $price->vcmid);
+				$stmt->bindParam("rocchargeperkm", $price->cpkm);
+				$stmt->bindParam("roccabservicesid", $price->csid);
+				$stmt->bindParam("rocvendorid", $vendor_id);
+				$stmt->execute();
+				$db = null;
+			} catch(PDOException $e) {
+				//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+				return '{"error":{"text":"'. $e->getMessage() .'""}}'; 
+				//break;
+			}
+		}
+	}
+	return 'Successfully updated';
+}
+
+/*
+ * insert vendor terms and conditions
+ */
+function insert_vendorterms($vendorterms) {
+	$vendorterms = json_decode($vendorterms);
+	$vendor_id = $vendorterms->vid;
+	$content = $vendorterms->content;
+	$sql = "INSERT INTO rocvendorterms(rocvendorid, rocvendorterms) VALUES(:rocvendorid, :rocvendorterms)";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->bindParam("rocvendorid", $vendor_id);
+		$stmt->bindParam("rocvendorterms", $content);
+		$stmt->execute();
+		$db = null;
+		return 'Successfully inserted';
+	} catch(PDOException $e) {
+		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"text":"'. $e->getMessage() .'""}}'; 
+		//break;
 	}
 }
 ?>
