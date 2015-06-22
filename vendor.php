@@ -4,7 +4,7 @@
  */
 function search($search) {
 	$search = json_decode($search);
-	$sql = "SELECT vc.roccabtype as cabtype, vc.roccabmodel as cabmodel, vc.rocchargeperkm as chargeperkm, v.rocvendorid as vendorid, v.rocvendorname as vendorname, v.rocvendoraddress as vendoraddress, v.rocvendorlogo as vendorlogo, v.rocvendorrating as vendorrating FROM rocvendorcharges vc, rocvendors v WHERE vc.rocvendorid = v.rocvendorid AND vc.roccabtype = :roccabtype";
+	$sql = "SELECT vc.roccabtype as cabtype, vc.roccabmodelid as cabmodel, vc.rocchargeperkm as chargeperkm, v.rocvendorid as vendorid, v.rocvendorname as vendorname, v.rocvendoraddress as vendoraddress, v.rocvendorlogo as vendorlogo, v.rocvendorrating as vendorrating FROM rocvendorcharges vc, rocvendors v WHERE vc.rocvendorid = v.rocvendorid AND vc.roccabtype = :roccabtype";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
@@ -157,7 +157,7 @@ function vendor_data($rocvendorid) {
 		$stmt->execute();		
 		$vendor_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
-		return json_encode($vendor_data);
+		return json_encode($vendor_data[0]);
 		
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');

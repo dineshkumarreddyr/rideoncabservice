@@ -218,3 +218,122 @@ Response :
 Status code : 200
 Response :
 {"error":{"message":SQLSTATE[23000]: Integrity constraint violation: 1048 Column 'rocuserfirstname' cannot be null}}
+------------------------------------------------------------------------------------------------------------
+Title : Vendor Login
+URL : {base_url}/vendor/login
+Method : POST
+Request : {
+    "username": "ravi@gmail.com",
+    "password": "12345"
+}
+
+1.
+Status code : 400
+Response :
+{"error":"validation","fields":{"username":"username required","password":"password required"}}
+
+2.
+Status code : 400
+Response :
+{"error":"validation","fields":{"username":"Username should not be empty","password":"Password should not be empty"}}
+
+3.
+Status code : 401
+Response :
+{"error":"Invalid","error_description":"Invalid username or password"}
+
+4.
+Status code : 200
+Response :
+{"vid":"2","name":"ravi","address":"hyd","email":"ravi@gmail.com","number1":"7569508595","number2":"7569508596","username":"ravi@gmail.com","contactperson":"uday","logo":"logo"}
+------------------------------------------------------------------------------------------------------------
+Title : Vendor services
+URL : {base_url}/vendor/services
+Method : POST
+Request : 
+{
+    "vid": "1",
+    "services": [
+        {
+            "cabtype": "MINI",
+            "cabmodel": "12345"
+        },
+        {
+            "cabtype": "SWAGAN",
+            "cabmodel": "123456"
+        }
+    ]
+}
+
+1.
+Status code : 400
+Response :
+{"error":"validation","fields":{"vid":"Vendor id should not be empty","services":"services required"}}
+
+2.
+Status code : 200
+Response :
+Successfully updated
+------------------------------------------------------------------------------------------------------------
+Title : Vendor Cab model by vendorid
+URL : {base_url}/vendor/cabmodel/{vendorid}
+Method : GET
+
+1.
+Status code : 200
+Response :
+{"total":0,"results":[]}
+
+2.
+Status code : 200
+Response :
+{"total":7,"results":[{"vcmid":"13","vcm":"12345"},{"vcmid":"14","vcm":"12345"},{"vcmid":"15","vcm":"12345"},{"vcmid":"16","vcm":"12345"},{"vcmid":"17","vcm":"123456"},{"vcmid":"18","vcm":"12345"},{"vcmid":"19","vcm":"123456"}]}
+------------------------------------------------------------------------------------------------------------
+Title : Vendor prices
+URL : {base_url}/vendor/prices
+Method : POST
+Request : 
+{
+    "vid": "1",
+    "prices": [
+        {
+            "vcmid": "12",
+            "cpkm": "100",
+            "csid": "123"
+        },
+        {
+            "vcmid": "123",
+            "cpkm": "150",
+            "csid": "133"
+        }
+    ]
+}
+
+1.
+Status code : 400
+Response :
+{"error":"validation","fields":{"vid":"Vendor id should not be empty","prices":"services required"}}
+
+2.
+Status code : 200
+Response :
+Successfully updated
+------------------------------------------------------------------------------------------------------------
+Title : Vendor terms
+URL : {base_url}/vendor/terms
+Method : POST
+Request : 
+{
+    "vid": "1",
+    "conetn": "terms and conditions content"
+}
+
+1.
+Status code : 400
+Response :
+{"error":"validation","fields":{"vid":"Vendor id should not be empty","content":"Content should not be empty"}}
+
+2.
+Status code : 200
+Response :
+Successfully inserted
