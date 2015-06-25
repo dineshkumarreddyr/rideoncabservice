@@ -575,10 +575,10 @@ $app->post(
 			}
 			// checking address is empty or not 
 			if(isset($request_data->address)) {
-				if(!v::string()->notEmpty()->validate($request_data->address)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->address)) {
 					$fields['address'] = "Address should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			}
 			else {
 				$fields['address'] = "Address required";
@@ -608,10 +608,10 @@ $app->post(
 			}
 			// checking number2 is empty or not 
 			if(isset($request_data->number2)) {
-				if(!v::string()->notEmpty()->validate($request_data->number2)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->number2)) {
 					$fields['number2'] = "Number2 should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			}
 			else {
 				$fields['number2'] = "Number2 required";
@@ -641,10 +641,10 @@ $app->post(
 			}
 			// checking contact person is empty or not 
 			if(isset($request_data->contactperson)) {
-				if(!v::string()->notEmpty()->validate($request_data->contactperson)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->contactperson)) {
 					$fields['contactperson'] = "Contact person should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			}
 			else {
 				$fields['contactperson'] = "Contact person required";
@@ -652,10 +652,10 @@ $app->post(
 			}
 			// checking logo is empty or not 
 			if(isset($request_data->logo)) {
-				if(!v::string()->notEmpty()->validate($request_data->logo)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->logo)) {
 					$fields['logo'] = "Logo should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			}
 			else {
 				$fields['logo'] = "Logo required";
