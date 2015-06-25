@@ -83,7 +83,8 @@ Title : Search
 URL : {base_url}/search
 Method : POST
 Request : {
-    "cabtype": "MINI"
+    "cabtype": "MINI",
+	"servicetype": "1"
 }
 
 1.
@@ -337,3 +338,12 @@ Response :
 Status code : 200
 Response :
 Successfully inserted
+------------------------------------------------------------------------------------------------------------
+Title : Cab services
+URL : {base_url}/cabservices
+Method : GET
+
+1.
+Status code : 200
+Response :
+[{"sid":"1","service":"Point to Point"},{"sid":"2","service":"Outstation"},{"sid":"3","service":"Hourly Package"},{"sid":"4","service":"Cab Here (Coming soon)"}]

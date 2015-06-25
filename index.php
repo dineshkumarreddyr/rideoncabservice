@@ -264,6 +264,17 @@ $app->post(
 				$fields['cabtype'] = "Cab type required";
 				$error = TRUE;
 			}
+			// checking service type is empty or not 
+			if(isset($request_data->servicetype)) {
+				if(!v::string()->notEmpty()->validate($request_data->servicetype)) {
+					$fields['servicetype'] = "Service type should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['cabtype'] = "Cab type required";
+				$error = TRUE;
+			}
 			
 			// Checking is validation errors there
 			if($error) {
@@ -851,6 +862,25 @@ $app->post(
 			}
 		}
 	}
+);
+
+// GET cab services route
+$app->get(
+  '/cabservices',
+  function () use ($app) {
+    echo $response_data = cabservices_data();
+    // checking is user id available or not
+    /*if($response_data == '[]') {
+    	// if user not aavailable with rocuserid throw 404
+    	$app->response->setStatus(404);
+    }
+    else {
+    	// if user available throw user data
+    	$json_data = json_decode($response_data);
+    	$user_data = $json_data[0];	// swapping first array object
+			echo json_encode($user_data);
+    }*/
+  }
 );
 
 $app->contentType('application/json');

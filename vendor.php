@@ -4,11 +4,12 @@
  */
 function search($search) {
 	$search = json_decode($search);
-	$sql = "SELECT vc.roccabtype as cabtype, vc.roccabmodelid as cabmodel, vc.rocchargeperkm as chargeperkm, v.rocvendorid as vendorid, v.rocvendorname as vendorname, v.rocvendoraddress as vendoraddress, v.rocvendorlogo as vendorlogo, v.rocvendorrating as vendorrating FROM rocvendorcharges vc, rocvendors v WHERE vc.rocvendorid = v.rocvendorid AND vc.roccabtype = :roccabtype";
+	$sql = "SELECT DISTINCT(v.rocvendorid) as vendorid, vc.roccabtype as cabtype, vc.roccabmodelid as cabmodel, vc.rocchargeperkm as chargeperkm, v.rocvendorname as vendorname, v.rocvendoraddress as vendoraddress, v.rocvendorlogo as vendorlogo, v.rocvendorrating as vendorrating FROM rocvendorcharges vc, rocvendors v, roccabservices cs WHERE vc.rocvendorid = v.rocvendorid AND vc.roccabtype = :roccabtype AND vc.roccabservicesid = :roccabservicesid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
 		$stmt->bindParam("roccabtype", $search->cabtype);
+		$stmt->bindParam("roccabservicesid", $search->servicetype);
 		$stmt->execute();
 		$search_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
@@ -317,6 +318,25 @@ function insert_vendorterms($vendorterms) {
 		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
 		return '{"error":{"text":"'. $e->getMessage() .'""}}'; 
 		//break;
+	}
+}
+
+/*
+ * Getting cab services data
+ */
+function cabservices_data() {
+	$sql = "SELECT roccabservicesid as sid, roccabservices as service FROM roccabservices";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->execute();		
+		$services_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		return json_encode($services_data);
+		
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
 	}
 }
 ?>
