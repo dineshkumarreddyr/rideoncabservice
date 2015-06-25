@@ -25,6 +25,11 @@ use Respect\Validation\Validator as v;
  */
 $app = new \Slim\Slim();
 
+
+$app->response->headers->set('Access-Control-Allow-Origin', '*');
+$app->response->headers->set('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+$app->response->headers->set('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+ 
 /**
  * Step 3: Define the Slim application routes
  *
@@ -227,9 +232,17 @@ $app->post(
 			else {
 				// If no validation errors
 				$response_data = user_login($request->getBody());
-				$json_data = json_decode($response_data);
-	    	$user_data = $json_data[0];	// swapping first array object
-	    	echo json_encode($user_data);
+				$response_json_data = json_decode($response_data);
+				// checking is user successfully logggedin or not
+				if(isset($response_json_data->error)) {
+					$app->response->setStatus(401);
+					echo $response_data;
+				}
+				else {
+					//$json_data = json_decode($response_data);
+	    			$user_data = $response_json_data[0];	// swapping first array object
+	    			echo json_encode($user_data);
+	    		}
 			}
 		}
 	}
