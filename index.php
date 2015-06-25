@@ -248,6 +248,63 @@ $app->post(
 	}
 );
 
+// User Login route
+$app->put(
+	'/user/changepassword/:rocuserid',
+	function ($rocuserid) use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+			);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$request_data = json_decode($request_data);
+			$fields = array(); // error fields array creation
+			$error = FALSE; // validation error checking variable
+			// checking password is empty or not 
+			if(isset($request_data->password)) {
+				if(!v::string()->notEmpty()->validate($request_data->password)) {
+					$fields['password'] = "Password should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['password'] = "password required";
+				$error = TRUE;
+			}
+
+			// Checking is validation errors there
+			if($error) {
+				// If any validation errors
+				$response = array(
+					'error' => 'validation',
+					'fields' => $fields
+				);
+				$app->response->setStatus(400);
+				echo json_encode($response);
+			}
+			else {
+				// If no validation errors
+				$response_data = user_changepassword($request->getBody(), $rocuserid);
+				$response_json_data = json_decode($response_data);
+				// checking is user password successfully changed or not
+				if(isset($response_json_data->error)) {
+					$app->response->setStatus(401);
+					echo $response_data;
+				}
+				else {
+					echo $response_data;
+	    		}
+			}
+		}
+	}
+);
+
 // List of Vendor SEARCH RESULT  route
 $app->post(
 	'/search',

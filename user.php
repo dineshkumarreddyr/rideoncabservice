@@ -121,4 +121,31 @@ function user_login($loginData) {
 		return '{"error":{"text":"'. $e->getMessage() .'"}}'; 
 	}
 }
+
+/*
+ * User change password by user id and return status
+ */
+function user_changepassword($passwordData, $rocuserid) {
+	$passwordData = json_decode($passwordData);
+	$sql = "UPDATE rocusers SET rocuserpassword = :rocuserpassword WHERE rocuserid = :rocuserid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);  
+		$stmt->bindParam(":rocuserpassword", $passwordData->password);
+		$stmt->bindParam(":rocuserid", $rocuserid);
+		$stmt->execute();
+		$db = null;
+
+		if($stmt->rowCount()) {
+			return "Password successfully updated";
+		}
+		else {
+			$status_data = array("error" => "Invalid", "error_description" => "Invalid user");
+			return json_encode($status_data);
+		}
+	} catch(PDOException $e) {
+		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"text":"'. $e->getMessage() .'"}}'; 
+	}
+}
 ?>
