@@ -324,7 +324,7 @@ $app->post(
 			$fields = array(); // error fields array creation
 			$error = FALSE; // validation error checking variable
 			// checking cab type is empty or not 
-			if(isset($request_data->cabtype)) {
+			/*if(isset($request_data->cabtype)) {
 				if(!v::string()->notEmpty()->validate($request_data->cabtype)) {
 					$fields['cabtype'] = "Cab type should not be empty";
 					$error = TRUE;
@@ -333,7 +333,7 @@ $app->post(
 			else {
 				$fields['cabtype'] = "Cab type required";
 				$error = TRUE;
-			}
+			}*/
 			// checking service type is empty or not 
 			if(isset($request_data->servicetype)) {
 				if(!v::string()->notEmpty()->validate($request_data->servicetype)) {
