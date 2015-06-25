@@ -110,20 +110,20 @@ $app->post(
 			}
 			// checking city is empty or not
 			if(isset($request_data->city)) {
-				if(!v::string()->notEmpty()->validate($request_data->city)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->city)) {
 					$fields['city'] = "City should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			} else {
 				$fields['city'] = "City required";
 				$error = TRUE;
 			}
 			// checking state is empty or not
 			if(isset($request_data->state)) {
-				if(!v::string()->notEmpty()->validate($request_data->state)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->state)) {
 					$fields['state'] = "State should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			} else {
 				$fields['state'] = "State required";
 				$error = TRUE;
