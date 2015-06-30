@@ -385,3 +385,10 @@ Request
 Status code : 200
 Response :
 {"vid":"11","name":"Venkateshwara Travels","contactperson":"venkata","number1":"9738134646","number2":"7569508597","address":"mothi nager, hyderabad","email":"venkateswara@gmail.com","exp":"3","nocif":"10","fname":"uday","femail":"uday@gmail.com","slocation":"Hyderabad","rlproof":"123456","tcards":"12345"}
+
+------------------------------------------------------------------------------------------------------------
+Title : Vendor bookings by id
+URL : {base_url}/vendor/bookings/{vendor_id}
+Method : GET
+
+Response :

@@ -925,7 +925,6 @@ $app->put(
 			}
 			else {
 				// If no validation errors
-				// echo 'ok';
 				$response_data = vendor_updatedetails($vendorid, $request->getBody());
 				$response_json_data = json_decode($response_data);
 				// checking is vendor successfully updated or not
@@ -1186,6 +1185,14 @@ $app->get(
   '/cabservices',
   function () use ($app) {
     echo $response_data = cabservices_data();
+  }
+);
+
+// GET cab bookings by vendor id route
+$app->get(
+  '/vendor/bookings/:vendorid',
+  function ($vendorid) use ($app) {
+    echo $response_data = vendor_bookings($vendorid);
   }
 );
 

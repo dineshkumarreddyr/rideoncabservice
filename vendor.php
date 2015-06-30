@@ -409,4 +409,37 @@ function cabservices_data() {
 		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
 	}
 }
+
+/*
+ * Getting all bookings by vendor for vendor manage bookings
+ */
+function vendor_bookings($vendorid) {
+	$sql = "SELECT 
+	rocbookinginfoid as bookingid, 
+	rocservicetype as servicetype, 
+	rocbookingfromlocation as fromlocation, 
+	rocbookingtolocation as tolocation, 
+	rocbookingdatetime as bookingdatetime 
+	FROM rocbookinginfo WHERE rocvendorid = :rocvendorid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);
+		$stmt->bindParam("rocvendorid", $vendorid);
+		$stmt->execute();		
+		$bookings_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		$count = count($bookings_data);
+		if($count) {
+			$bookings_data = array("total" => $count, "results" => $bookings_data);
+			return json_encode($bookings_data);
+		}
+		else {
+			$bookings_data = array("total" => 0, "results" => array());
+			return json_encode($bookings_data);
+		}
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+	}
+}
 ?>
