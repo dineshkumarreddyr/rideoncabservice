@@ -83,7 +83,6 @@ Title : Search
 URL : {base_url}/search
 Method : POST
 Request : {
-    "cabtype": "MINI",
 	"servicetype": "1"
 }
 
@@ -347,3 +346,42 @@ Method : GET
 Status code : 200
 Response :
 [{"sid":"1","service":"Point to Point"},{"sid":"2","service":"Outstation"},{"sid":"3","service":"Hourly Package"},{"sid":"4","service":"Cab Here (Coming soon)"}]
+
+------------------------------------------------------------------------------------------------------------
+Title : Vendor Update details
+URL : {base_url}/vendor/updatedetails/{vendor_id}
+Method : PUT
+Request
+{
+    "name": "Venkateshwara Travels",
+    "contactperson": "venkata",
+    "number1": "9738134646",
+    "number2": "7569508597",
+    "address": "mothi nager, hyderabad",
+    "exp": "3",
+    "nocif": "10",
+    "fname": "uday",
+    "femail": "uday@gmail.com",
+    "slocation": "Hyderabad",
+    "tlproof": "123456",
+    "tcards": "12345"
+}
+
+1.
+Status code : 200
+Response :
+{"vid":"11","name":"Venkateshwara Travels","contactperson":"venkata","number1":"9738134646","number2":"7569508597","address":"mothi nager, hyderabad","email":"venkateswara@gmail.com","exp":"3","nocif":"10","fname":"uday","femail":"uday@gmail.com","slocation":"Hyderabad","rlproof":"123456","tcards":"12345"}
+
+------------------------------------------------------------------------------------------------------------
+Title : Vendor change password
+URL : {base_url}/vendor/changepassword/{vendor_id}
+Method : PUT
+Request
+{
+    "password": "12345"
+}
+
+1.
+Status code : 200
+Response :
+{"vid":"11","name":"Venkateshwara Travels","contactperson":"venkata","number1":"9738134646","number2":"7569508597","address":"mothi nager, hyderabad","email":"venkateswara@gmail.com","exp":"3","nocif":"10","fname":"uday","femail":"uday@gmail.com","slocation":"Hyderabad","rlproof":"123456","tcards":"12345"}

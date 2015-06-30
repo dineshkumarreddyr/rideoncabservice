@@ -149,8 +149,13 @@ function vendor_login($loginData) {
 /*
  * Getting vendor data by vendor unique ID
  */
-function vendor_data($rocvendorid) {
-	$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendoraddress as address, rocvendoremail as email, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendorusername as username, rocvendorcontactperson as contactperson, rocvendorlogo as logo FROM rocvendors WHERE  rocvendorid = :rocvendorid";
+function vendor_data($rocvendorid, $mode = 'mini') {
+	if($mode == 'full') {
+		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendorcontactperson as contactperson, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendoraddress as address, rocvendoremail as email, rocvendorexp as exp, rocvendornocif as nocif, rocvendorfname as fname, rocvendorfemail as femail, rocvendorslocation as slocation, rocvendortlproof as rlproof, rocvendortcards as tcards FROM rocvendors WHERE  rocvendorid = :rocvendorid";
+	}
+	else {
+		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendoraddress as address, rocvendoremail as email, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendorusername as username, rocvendorcontactperson as contactperson, rocvendorlogo as logo FROM rocvendors WHERE  rocvendorid = :rocvendorid";
+	}
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
@@ -163,6 +168,71 @@ function vendor_data($rocvendorid) {
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
 		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+	}
+}
+
+/*
+ * Vendor update details 
+ */
+function vendor_updatedetails($vendorid, $updateDetails) {
+	// if(!vendor_signUpCheck($signUpData)) {
+		$updateDetails = json_decode($updateDetails);
+		$sql = "UPDATE rocvendors SET rocvendorname = :rocvendorname, rocvendorcontactperson = :rocvendorcontactperson, rocvendornumber1 = :rocvendornumber1, rocvendornumber2 = :rocvendornumber2, rocvendoraddress = :rocvendoraddress, rocvendorexp = :rocvendorexp,  rocvendornocif = :rocvendornocif, rocvendorfname = :rocvendorfname, rocvendorfemail = :rocvendorfemail, rocvendorslocation = :rocvendorslocation, rocvendortlproof = :rocvendortlproof, rocvendortcards =:rocvendortcards WHERE rocvendorid = :rocvendorid";
+		try {
+			$db = getDB();
+			$stmt = $db->prepare($sql);  
+			$stmt->bindParam(":rocvendorname", $updateDetails->name);
+			$stmt->bindParam(":rocvendorcontactperson", $updateDetails->contactperson);
+			$stmt->bindParam(":rocvendornumber1", $updateDetails->number1);
+			$stmt->bindParam(":rocvendornumber2", $updateDetails->number2);
+			$stmt->bindParam(":rocvendoraddress", $updateDetails->address);
+			$stmt->bindParam(":rocvendorexp", $updateDetails->exp);
+			$stmt->bindParam(":rocvendornocif", $updateDetails->nocif);
+			$stmt->bindParam(":rocvendorfname", $updateDetails->fname);
+			$stmt->bindParam(":rocvendorfemail", $updateDetails->femail);
+			$stmt->bindParam(":rocvendorslocation", $updateDetails->slocation);
+			$stmt->bindParam(":rocvendortlproof", $updateDetails->tlproof);
+			$stmt->bindParam(":rocvendortcards", $updateDetails->tcards);
+			$stmt->bindParam(":rocvendorid", $vendorid);
+
+			$stmt->execute();
+			$db = null;
+			return vendor_data($vendorid, 'full');
+		} catch(PDOException $e) {
+			//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+			return '{"error":{"text":"'. $e->getMessage() .'"}}'; 
+		}
+	// }
+	// else {
+	// 	$status_data = array("error" => "duplicate", "erro_description" => "This email already exists");
+	// 	return json_encode($status_data);
+	// }
+}
+
+/*
+ * Vendor change password by user id and return status
+ */
+function vendor_changepassword($passwordData, $rocvendorid) {
+	$passwordData = json_decode($passwordData);
+	$sql = "UPDATE rocvendors SET rocvendorpassword = :rocvendorpassword WHERE rocvendorid = :rocvendorid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);  
+		$stmt->bindParam(":rocvendorpassword", $passwordData->password);
+		$stmt->bindParam(":rocvendorid", $rocvendorid);
+		$stmt->execute();
+		$db = null;
+
+		if($stmt->rowCount()) {
+			return "Password successfully updated";
+		}
+		else {
+			$status_data = array("error" => "Invalid", "error_description" => "Invalid user");
+			return json_encode($status_data);
+		}
+	} catch(PDOException $e) {
+		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"text":"'. $e->getMessage() .'"}}'; 
 	}
 }
 

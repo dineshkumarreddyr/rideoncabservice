@@ -752,6 +752,253 @@ $app->post(
 	}
 );
 
+
+// Vendor update details route
+$app->put(
+    '/vendor/updatedetails/:vendorid',
+    function ($vendorid) use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+			);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$request_data = json_decode($request_data);
+			$fields = array(); // error fields array creation
+			$error = FALSE; // validation error checking variable
+			// checking name is empty or not 
+			if(isset($request_data->name)) {
+				if(!v::string()->notEmpty()->validate($request_data->name)) {
+					$fields['name'] = "Name should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['name'] = "Name required";
+				$error = TRUE;
+			}
+			// checking contact person is empty or not 
+			if(isset($request_data->contactperson)) {
+				if(!v::string()->notEmpty()->validate($request_data->contactperson)) {
+					$fields['contactperson'] = "Contact person should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['contactperson'] = "Contact person required";
+				$error = TRUE;
+			}
+			// checking number1 is empty or not 
+			if(isset($request_data->number1)) {
+				if(!v::string()->notEmpty()->validate($request_data->number1)) {
+					$fields['number1'] = "Number1 should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['number1'] = "Number1 required";
+				$error = TRUE;
+			}
+			// checking number2 is empty or not 
+			if(isset($request_data->number2)) {
+				if(!v::string()->notEmpty()->validate($request_data->number2)) {
+					$fields['number2'] = "Number2 should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['number2'] = "Number2 required";
+				$error = TRUE;
+			}
+			/*// checking email is empty or not 
+			if(isset($request_data->email)) {
+				if(!v::string()->notEmpty()->validate($request_data->email)) {
+					$fields['email'] = "Email should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['email'] = "Email required";
+				$error = TRUE;
+			}*/
+			// checking address is empty or not 
+			if(isset($request_data->address)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->address)) {
+					$fields['address'] = "Address should not be empty";
+					$error = TRUE;
+				}*/
+			}
+			else {
+				$fields['address'] = "Address required";
+				$error = TRUE;
+			}
+			// checking experience is empty or not 
+			if(isset($request_data->exp)) {
+				if(!v::string()->notEmpty()->validate($request_data->exp)) {
+					$fields['exp'] = "Experience should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['exp'] = "Experience required";
+				$error = TRUE;
+			}
+			// checking No of cabs in fleet is empty or not 
+			if(isset($request_data->nocif)) {
+				if(!v::string()->notEmpty()->validate($request_data->nocif)) {
+					$fields['nocif'] = "No of cabs in fleet should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['nocif'] = "No of cabs in fleet required";
+				$error = TRUE;
+			}
+			// checking Founder Name is empty or not 
+			if(isset($request_data->fname)) {
+				if(!v::string()->notEmpty()->validate($request_data->fname)) {
+					$fields['fname'] = "Founder Name should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['fname'] = "Founder Name required";
+				$error = TRUE;
+			}
+			// checking Founder Email is empty or not 
+			if(isset($request_data->femail)) {
+				if(!v::string()->notEmpty()->validate($request_data->femail)) {
+					$fields['femail'] = "Founder Email should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['femail'] = "Founder Email required";
+				$error = TRUE;
+			}
+			// checking Service Location is empty or not 
+			if(isset($request_data->slocation)) {
+				if(!v::string()->notEmpty()->validate($request_data->slocation)) {
+					$fields['slocation'] = "Service Location should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['slocation'] = "Service Location required";
+				$error = TRUE;
+			}
+			// checking  travel licence proof is empty or not 
+			if(isset($request_data->tlproof)) {
+				if(!v::string()->notEmpty()->validate($request_data->tlproof)) {
+					$fields['tlproof'] = " Travel licence proof should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['tlproof'] = "Travel licence proof required";
+				$error = TRUE;
+			}
+			// checking  tarrif cards is empty or not 
+			if(isset($request_data->tcards)) {
+				if(!v::string()->notEmpty()->validate($request_data->tcards)) {
+					$fields['tcards'] = " Tarrif cards should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['tcards'] = "Tarrif cards proof required";
+				$error = TRUE;
+			}
+			// Checking is validation there
+			if($error) {
+				$response = array(
+					'error' => 'validation',
+					'fields' => $fields
+				);
+				$app->response->setStatus(400);
+				echo json_encode($response);
+			}
+			else {
+				// If no validation errors
+				// echo 'ok';
+				$response_data = vendor_updatedetails($vendorid, $request->getBody());
+				$response_json_data = json_decode($response_data);
+				// checking is vendor successfully updated or not
+				if(isset($response_json_data->error)) {
+					$app->response->setStatus(409);
+					echo $response_data;
+				}
+				else {
+					$app->response->setStatus(200);
+		    	echo $response_data;
+				}
+			}
+    }
+  }
+);
+
+// Vendor Change password route
+$app->put(
+	'/vendor/changepassword/:rocuserid',
+	function ($rocuserid) use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+			);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$request_data = json_decode($request_data);
+			$fields = array(); // error fields array creation
+			$error = FALSE; // validation error checking variable
+			// checking password is empty or not 
+			if(isset($request_data->password)) {
+				if(!v::string()->notEmpty()->validate($request_data->password)) {
+					$fields['password'] = "Password should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['password'] = "password required";
+				$error = TRUE;
+			}
+
+			// Checking is validation errors there
+			if($error) {
+				// If any validation errors
+				$response = array(
+					'error' => 'validation',
+					'fields' => $fields
+				);
+				$app->response->setStatus(400);
+				echo json_encode($response);
+			}
+			else {
+				// If no validation errors
+				$response_data = vendor_changepassword($request->getBody(), $rocuserid);
+				$response_json_data = json_decode($response_data);
+				// checking is user password successfully changed or not
+				if(isset($response_json_data->error)) {
+					$app->response->setStatus(401);
+					echo $response_data;
+				}
+				else {
+					echo $response_data;
+	    		}
+			}
+		}
+	}
+);
+
 // vendor services
 $app->post(
 	'/vendor/services',
@@ -939,17 +1186,6 @@ $app->get(
   '/cabservices',
   function () use ($app) {
     echo $response_data = cabservices_data();
-    // checking is user id available or not
-    /*if($response_data == '[]') {
-    	// if user not aavailable with rocuserid throw 404
-    	$app->response->setStatus(404);
-    }
-    else {
-    	// if user available throw user data
-    	$json_data = json_decode($response_data);
-    	$user_data = $json_data[0];	// swapping first array object
-			echo json_encode($user_data);
-    }*/
   }
 );
 
@@ -961,9 +1197,6 @@ $app->contentType('application/json');
  * and returns the HTTP response to the HTTP client.
  */
 $app->run();
-
-
-
 
 function isJson($string) {
 	// if($string == '' || $string == '{}') return FALSE;

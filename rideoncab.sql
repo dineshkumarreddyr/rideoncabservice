@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 22, 2015 at 03:20 AM
+-- Generation Time: Jun 30, 2015 at 05:40 AM
 -- Server version: 5.6.21
 -- PHP Version: 5.6.3
 
@@ -46,15 +46,6 @@ CREATE TABLE IF NOT EXISTS `rocbookinginfo` (
   `rocvendorid` int(11) NOT NULL,
   `rocbookingstatus` varchar(45) NOT NULL DEFAULT 'active'
 ) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `rocbookinginfo`
---
-
-INSERT INTO `rocbookinginfo` (`rocbookinginfoid`, `roctransactionid`, `rocservicetype`, `rocservicename`, `rocservicechargeperkm`, `rocservicekm`, `rocservicestimatedrs`, `rocbookingfromlocation`, `rocbookingtolocation`, `rocserviceclass`, `rocuserid`, `createduser`, `modifieduser`, `createddate`, `modifieddate`, `rocbookingdatetime`, `rocvendorid`, `rocbookingstatus`) VALUES
-(1, '1', 'OLA', 'OLA CAB', 10, 2, 5, 'hitech', 'jublee', '1A', 1, 'Admin', 'Admin', '2015-06-15 00:32:47', '2015-06-15 00:32:47', '0000-00-00 00:00:00', 1, 'Success'),
-(3, '2', 'OLA', 'OLA CAB', 10, 2, 5, 'hitech', 'jublee', '1A', 1, 'Admin', 'Admin', '2015-06-15 00:33:54', '2015-06-15 00:33:54', '0000-00-00 00:00:00', 1, 'Success'),
-(30, '', 'MINI', 'OLA', 10, 2, 150, 'Hitech', 'Jublee', 'MINI', 1, 'Admin', 'Admin', '2015-06-17 11:58:36', '0000-00-00 00:00:00', '0000-00-00 00:00:00', 1, 'book');
 
 -- --------------------------------------------------------
 
@@ -146,22 +137,14 @@ CREATE TABLE IF NOT EXISTS `rocusers` (
   `rocusersaddress2` mediumtext,
   `rocuserpincode` int(11) DEFAULT NULL,
   `rocuserpassword` mediumtext
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `rocusers`
 --
 
 INSERT INTO `rocusers` (`rocuserid`, `rocuserfirstname`, `rocuserlastname`, `rocuseremail`, `rocusercity`, `rocuserstate`, `rocusermobile`, `createduser`, `modifieduser`, `createddate`, `modifieddate`, `rocuseraddress1`, `rocusersaddress2`, `rocuserpincode`, `rocuserpassword`) VALUES
-(1, 'uday', 'kumar', 'udayakumarswamy@gmail.com', 'Hyd', 'AP', '7569508595', 'Admin', 'Admin', '2015-06-14 19:56:10', '2015-06-14 19:56:10', NULL, NULL, NULL, '12345'),
-(2, 'uday', 'kumar', 'udayakumarswamy@gmail.com', 'Hyd', 'AP', '7569508595', 'Admin', 'Admin', '2015-06-14 20:09:04', '2015-06-14 20:09:04', NULL, NULL, NULL, '12345'),
-(3, 'uday', 'kumar', 'udayakumarswamy1@gmail.com', 'Hyd', 'AP', '7569508595', 'Admin', 'Admin', '2015-06-14 20:12:31', '2015-06-14 20:12:31', NULL, NULL, NULL, '12345'),
-(4, 'uday', 'kumar', 'udayakumarswamy2@gmail.com', 'Hyd', 'AP', '7569508595', 'Admin', 'Admin', '2015-06-14 20:28:51', '2015-06-14 20:28:51', NULL, NULL, NULL, '12345'),
-(5, 'uday', 'kumar', 'udayakumarswamy3@gmail.com', 'hyd', 'AP', '7569508595', 'Admin', 'Admin', '2015-06-17 09:50:23', '0000-00-00 00:00:00', NULL, NULL, NULL, '123456'),
-(6, 'uday', 'kumar', 'udayakumarswamy4@gmail.com', 'hyd', 'AP', '7569508595', 'Admin', 'Admin', '2015-06-17 10:27:43', '0000-00-00 00:00:00', NULL, NULL, NULL, '123456'),
-(7, 'uday', 'kumar', 'udayakumarswamy5@gmail.com', 'hyd', 'AP', '7569508595', 'Admin', 'Admin', '2015-06-17 10:30:35', '0000-00-00 00:00:00', NULL, NULL, NULL, '123456'),
-(8, 'uday', 'kumar', 'udayakumarswamy6@gmail.com', 'hyd', 'AP', '7569508595', 'Admin', 'Admin', '2015-06-17 10:32:34', '0000-00-00 00:00:00', NULL, NULL, NULL, '123456'),
-(9, 'uday', 'kumar', 'udayakumarswamy7@gmail.com', 'hyd', 'AP', '7569508595', 'Admin', 'Admin', '2015-06-17 10:43:28', '0000-00-00 00:00:00', NULL, NULL, NULL, '123456');
+(10, 'udaya kumar swamy', 'vasa', 'udayakumarswamy@gmail.com', 'hyd', 'AP', '7569508595', 'Admin', 'Admin', '2015-06-25 15:53:49', '0000-00-00 00:00:00', NULL, NULL, NULL, '12345');
 
 -- --------------------------------------------------------
 
@@ -178,16 +161,7 @@ CREATE TABLE IF NOT EXISTS `rocvendorcabmodel` (
   `modifieddate` timestamp NULL DEFAULT NULL,
   `createduser` varchar(100) DEFAULT NULL,
   `modifieduser` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `rocvendorcabmodel`
---
-
-INSERT INTO `rocvendorcabmodel` (`rocvendorcabmodelid`, `rocvendorcabtype`, `rocvendorcabmodel`, `rocvendorid`, `createddate`, `modifieddate`, `createduser`, `modifieduser`) VALUES
-(13, 'MINI', '12345', 1, '2015-06-21 07:43:12', NULL, NULL, NULL),
-(14, 'MINI', '12345', 1, '2015-06-21 07:43:12', NULL, NULL, NULL),
-(15, 'MINI', '12345', 1, '2015-06-21 07:44:54', NULL, NULL, NULL);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -206,16 +180,7 @@ CREATE TABLE IF NOT EXISTS `rocvendorcharges` (
   `modifieddate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `createduser` varchar(45) DEFAULT 'Admin',
   `modifieduser` varchar(45) DEFAULT 'Admin'
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `rocvendorcharges`
---
-
-INSERT INTO `rocvendorcharges` (`rocvendorchargeid`, `roccabtype`, `roccabmodelid`, `rocchargeperkm`, `roccabservicesid`, `rocvendorid`, `createddate`, `modifieddate`, `createduser`, `modifieduser`) VALUES
-(1, 'MINI', 'indica', 10, 0, 1, '2015-06-14 23:17:54', '2015-06-14 23:17:54', 'Admin', 'Admin'),
-(2, '', '12345', 100, 12, 1, '2015-06-21 09:41:53', '0000-00-00 00:00:00', 'Admin', 'Admin'),
-(3, '', '123', 150, 13, 1, '2015-06-21 09:41:53', '0000-00-00 00:00:00', 'Admin', 'Admin');
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -234,25 +199,27 @@ CREATE TABLE IF NOT EXISTS `rocvendors` (
   `rocvendorpassword` mediumtext NOT NULL,
   `rocvendorcontactperson` varchar(200) NOT NULL,
   `rocvendorlogo` mediumtext,
+  `rocvendorexp` int(11) NOT NULL,
+  `rocvendornocif` int(11) NOT NULL,
+  `rocvendorfname` varchar(60) NOT NULL,
+  `rocvendorfemail` varchar(225) NOT NULL,
+  `rocvendorslocation` varchar(60) NOT NULL,
+  `rocvendortlproof` varchar(60) NOT NULL,
+  `rocvendortcards` varchar(60) NOT NULL,
   `createddate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modifieddate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `createduser` varchar(45) DEFAULT 'Admin',
   `modifieduser` varchar(45) DEFAULT 'Admin',
   `rocvendorrating` int(11) DEFAULT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `rocvendors`
 --
 
-INSERT INTO `rocvendors` (`rocvendorid`, `rocvendorname`, `rocvendoraddress`, `rocvendoremail`, `rocvendornumber1`, `rocvendornumber2`, `rocvendorusername`, `rocvendorpassword`, `rocvendorcontactperson`, `rocvendorlogo`, `createddate`, `modifieddate`, `createduser`, `modifieduser`, `rocvendorrating`) VALUES
-(1, 'Aneel', 'vanalasti', 'annel@gmail.com', '7569508596', '7569508597', 'aneel@gmail.com', '12345', 'Aneel1', 'logo', '2015-06-14 23:17:21', '2015-06-14 23:17:21', 'Admin', 'Admin', 4),
-(2, 'ravi', 'hyd', 'ravi@gmail.com', '7569508595', '7569508596', 'ravi@gmail.com', '12345', 'uday', 'logo', '2015-06-15 22:05:43', '2015-06-15 22:05:43', 'Admin', 'Admin', NULL),
-(3, 'Name required', 'Address required', 'Email required', 'Number1 required', 'Number2 required', 'Username required', 'Password required', 'Contact person required', 'Logo required', '2015-06-17 12:47:19', '0000-00-00 00:00:00', 'Admin', 'Admin', NULL),
-(4, 'Name required', 'Address required', 'Email required', 'Number1 required', 'Number2 required', 'Username required', 'Password required', 'Contact person required', 'Logo required', '2015-06-17 12:47:31', '0000-00-00 00:00:00', 'Admin', 'Admin', NULL),
-(5, 'Name required', 'Address required', 'Email required', 'Number1 required', 'Number2 required', 'Username required', 'Password required', 'Contact person required', 'Logo required', '2015-06-17 12:47:54', '0000-00-00 00:00:00', 'Admin', 'Admin', NULL),
-(6, 'Aneel', 'vanalasti', 'aneel@gmail.com', 'Number1 required', 'Number2 required', 'Username required', 'Password required', 'Contact person required', 'Logo required', '2015-06-17 12:49:46', '0000-00-00 00:00:00', 'Admin', 'Admin', NULL),
-(7, 'Aneel', 'vanalasti', 'aneel1@gmail.com', 'Number1 required', 'Number2 required', 'Username required', 'Password required', 'Contact person required', 'Logo required', '2015-06-17 12:51:43', '0000-00-00 00:00:00', 'Admin', 'Admin', NULL);
+INSERT INTO `rocvendors` (`rocvendorid`, `rocvendorname`, `rocvendoraddress`, `rocvendoremail`, `rocvendornumber1`, `rocvendornumber2`, `rocvendorusername`, `rocvendorpassword`, `rocvendorcontactperson`, `rocvendorlogo`, `rocvendorexp`, `rocvendornocif`, `rocvendorfname`, `rocvendorfemail`, `rocvendorslocation`, `rocvendortlproof`, `rocvendortcards`, `createddate`, `modifieddate`, `createduser`, `modifieduser`, `rocvendorrating`) VALUES
+(11, 'Venkateshwara Travels', 'mothi nager, hyderabad', 'venkateswara@gmail.com', '9738134646', '7569508597', 'venkateswara@gmail.com', '123456', 'venkata', 'NA', 3, 10, 'uday', 'uday@gmail.com', 'Hyderabad', '123456', '12345', '2015-06-25 17:56:10', '0000-00-00 00:00:00', 'Admin', 'Admin', NULL),
+(12, 'OLA Cab', '', 'ola@gmail.com', '9849434343', '', 'ola@gmail.com', '123456', '', '', 0, 0, '', '', '', '', '', '2015-06-25 18:09:27', '0000-00-00 00:00:00', 'Admin', 'Admin', NULL);
 
 -- --------------------------------------------------------
 
@@ -268,14 +235,7 @@ CREATE TABLE IF NOT EXISTS `rocvendorterms` (
   `createduser` varchar(45) DEFAULT NULL,
   `modifieduser` varchar(45) DEFAULT NULL,
   `rocvendorid` int(11) NOT NULL
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `rocvendorterms`
---
-
-INSERT INTO `rocvendorterms` (`rocvendortermsid`, `rocvendorterms`, `createddate`, `modifieddate`, `createduser`, `modifieduser`, `rocvendorid`) VALUES
-(1, 'content', '2015-06-21 10:02:34', NULL, NULL, NULL, 1);
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Indexes for dumped tables
@@ -374,27 +334,27 @@ MODIFY `rocuserratingid` int(11) NOT NULL AUTO_INCREMENT;
 -- AUTO_INCREMENT for table `rocusers`
 --
 ALTER TABLE `rocusers`
-MODIFY `rocuserid` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=10;
+MODIFY `rocuserid` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=11;
 --
 -- AUTO_INCREMENT for table `rocvendorcabmodel`
 --
 ALTER TABLE `rocvendorcabmodel`
-MODIFY `rocvendorcabmodelid` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=16;
+MODIFY `rocvendorcabmodelid` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `rocvendorcharges`
 --
 ALTER TABLE `rocvendorcharges`
-MODIFY `rocvendorchargeid` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;
+MODIFY `rocvendorchargeid` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `rocvendors`
 --
 ALTER TABLE `rocvendors`
-MODIFY `rocvendorid` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=8;
+MODIFY `rocvendorid` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=13;
 --
 -- AUTO_INCREMENT for table `rocvendorterms`
 --
 ALTER TABLE `rocvendorterms`
-MODIFY `rocvendortermsid` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=2;
+MODIFY `rocvendortermsid` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- Constraints for dumped tables
 --
