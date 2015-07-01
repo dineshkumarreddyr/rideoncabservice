@@ -134,7 +134,7 @@ function vendor_login($loginData) {
 		$db = null;
 		//return json_encode($vendor_data);
 		if(count($vendor_data)) {
-			return vendor_data($vendor_data[0]->rocvendorid);
+			return vendor_data($vendor_data[0]->rocvendorid, 'full');
 		}
 		else {
 			$status_data = array("error" => "Invalid", "error_description" => "Invalid username or password");
@@ -151,7 +151,7 @@ function vendor_login($loginData) {
  */
 function vendor_data($rocvendorid, $mode = 'mini') {
 	if($mode == 'full') {
-		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendorcontactperson as contactperson, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendoraddress as address, rocvendoremail as email, rocvendorexp as exp, rocvendornocif as nocif, rocvendorfname as fname, rocvendorfemail as femail, rocvendorslocation as slocation, rocvendortlproof as rlproof, rocvendortcards as tcards FROM rocvendors WHERE  rocvendorid = :rocvendorid";
+		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendorcontactperson as contactperson, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendoraddress as address, rocvendoremail as email, rocvendorexp as exp, rocvendornocif as nocif, rocvendorfname as fname, rocvendorfemail as femail, rocvendorslocation as slocation, rocvendortlproof as rlproof, rocvendortcards as tcards, rocvendortarrif as tarrif, rocvendorlandline as landline FROM rocvendors WHERE  rocvendorid = :rocvendorid";
 	}
 	else {
 		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendoraddress as address, rocvendoremail as email, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendorusername as username, rocvendorcontactperson as contactperson, rocvendorlogo as logo FROM rocvendors WHERE  rocvendorid = :rocvendorid";
@@ -177,7 +177,7 @@ function vendor_data($rocvendorid, $mode = 'mini') {
 function vendor_updatedetails($vendorid, $updateDetails) {
 	// if(!vendor_signUpCheck($signUpData)) {
 		$updateDetails = json_decode($updateDetails);
-		$sql = "UPDATE rocvendors SET rocvendorname = :rocvendorname, rocvendorcontactperson = :rocvendorcontactperson, rocvendornumber1 = :rocvendornumber1, rocvendornumber2 = :rocvendornumber2, rocvendoraddress = :rocvendoraddress, rocvendorexp = :rocvendorexp,  rocvendornocif = :rocvendornocif, rocvendorfname = :rocvendorfname, rocvendorfemail = :rocvendorfemail, rocvendorslocation = :rocvendorslocation, rocvendortlproof = :rocvendortlproof, rocvendortcards =:rocvendortcards WHERE rocvendorid = :rocvendorid";
+		$sql = "UPDATE rocvendors SET rocvendorname = :rocvendorname, rocvendorcontactperson = :rocvendorcontactperson, rocvendornumber1 = :rocvendornumber1, rocvendornumber2 = :rocvendornumber2, rocvendoraddress = :rocvendoraddress, rocvendorexp = :rocvendorexp,  rocvendornocif = :rocvendornocif, rocvendorfname = :rocvendorfname, rocvendorfemail = :rocvendorfemail, rocvendorslocation = :rocvendorslocation, rocvendortlproof = :rocvendortlproof, rocvendortcards =:rocvendortcards, rocvendortarrif = :rocvendortarrif, rocvendorlandline = :rocvendorlandline WHERE rocvendorid = :rocvendorid";
 		try {
 			$db = getDB();
 			$stmt = $db->prepare($sql);  
@@ -193,6 +193,8 @@ function vendor_updatedetails($vendorid, $updateDetails) {
 			$stmt->bindParam(":rocvendorslocation", $updateDetails->slocation);
 			$stmt->bindParam(":rocvendortlproof", $updateDetails->tlproof);
 			$stmt->bindParam(":rocvendortcards", $updateDetails->tcards);
+			$stmt->bindParam(":rocvendortarrif", $updateDetails->tarrif);
+			$stmt->bindParam(":rocvendorlandline", $updateDetails->landline);
 			$stmt->bindParam(":rocvendorid", $vendorid);
 
 			$stmt->execute();
@@ -214,17 +216,37 @@ function vendor_updatedetails($vendorid, $updateDetails) {
  */
 function vendor_changepassword($passwordData, $rocvendorid) {
 	$passwordData = json_decode($passwordData);
-	$sql = "UPDATE rocvendors SET rocvendorpassword = :rocvendorpassword WHERE rocvendorid = :rocvendorid";
+	$sql = "SELECT rocvendorpassword FROM rocvendors WHERE rocvendorid = :rocvendorid";
+	// $sql = "UPDATE rocvendors SET rocvendorpassword = :rocvendorpassword WHERE rocvendorid = :rocvendorid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql);  
-		$stmt->bindParam(":rocvendorpassword", $passwordData->password);
+		// $stmt->bindParam(":rocvendorpassword", $passwordData->password);
 		$stmt->bindParam(":rocvendorid", $rocvendorid);
 		$stmt->execute();
+		$vendor_data = $stmt->fetch(PDO::FETCH_OBJ);
 		$db = null;
 
-		if($stmt->rowCount()) {
-			return "Password successfully updated";
+		if(count($vendor_data)) {
+			if($vendor_data->rocvendorpassword == $passwordData->opassword) {
+				$sql = "UPDATE rocvendors SET rocvendorpassword = :rocvendorpassword WHERE rocvendorid = :rocvendorid";
+				$db = getDB();
+				$stmt = $db->prepare($sql);  
+				$stmt->bindParam(":rocvendorpassword", $passwordData->password);
+				$stmt->bindParam(":rocvendorid", $rocvendorid);
+				$stmt->execute();
+				if($stmt->rowCount()) {
+					return "Password successfully updated";
+				}
+				else {
+					$status_data = array("error" => "Invalid", "error_description" => "Password updating failed");
+					return json_encode($status_data);
+				}
+			}
+			else {
+				$status_data = array("error" => "Invalid", "error_description" => "Invalid Old Password");
+				return json_encode($status_data);
+			}
 		}
 		else {
 			$status_data = array("error" => "Invalid", "error_description" => "Invalid user");
@@ -369,6 +391,26 @@ function insert_vendorprices($vendorprices) {
 }
 
 /*
+ * get vendor terms and conditions by vendor id
+ */
+function get_vendorterms($vendorid) {
+	$sql = "SELECT rocvendorterms as terms FROM rocvendorterms WHERE rocvendorid = :rocvendorid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->bindParam("rocvendorid", $vendorid);
+		$stmt->execute();
+		$terms_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		return json_encode($terms_data)
+	} catch(PDOException $e) {
+		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"text":"'. $e->getMessage() .'""}}'; 
+		//break;
+	}
+}
+
+/*
  * insert vendor terms and conditions
  */
 function insert_vendorterms($vendorterms) {
@@ -411,6 +453,25 @@ function cabservices_data() {
 }
 
 /*
+ * Getting cab type data
+ */
+function cabtypes_data() {
+	$sql = "SELECT roccabtypeid as ctid, roccabtype as ctype FROM roccabtypes";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->execute();		
+		$services_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		return json_encode($services_data);
+		
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+	}
+}
+
+/*
  * Getting all bookings by vendor for vendor manage bookings
  */
 function vendor_bookings($vendorid) {
@@ -421,6 +482,39 @@ function vendor_bookings($vendorid) {
 	rocbookingtolocation as tolocation, 
 	rocbookingdatetime as bookingdatetime 
 	FROM rocbookinginfo WHERE rocvendorid = :rocvendorid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);
+		$stmt->bindParam("rocvendorid", $vendorid);
+		$stmt->execute();		
+		$bookings_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		$count = count($bookings_data);
+		if($count) {
+			$bookings_data = array("total" => $count, "results" => $bookings_data);
+			return json_encode($bookings_data);
+		}
+		else {
+			$bookings_data = array("total" => 0, "results" => array());
+			return json_encode($bookings_data);
+		}
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+	}
+}
+
+/*
+ * Getting all services by vendor for vendor manage services
+ */
+function vendor_services($vendorid) {
+	$sql = "SELECT 
+	rocvendorchargeid as vcid, 
+	roccabtype as vctype, 
+	roccabmodelid as vcmid, 
+	rocchargeperkm as cpkm, 
+	roccabservicesid as csid 
+	FROM rocvendorcharges WHERE rocvendorid = :rocvendorid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql);

@@ -347,6 +347,18 @@ Status code : 200
 Response :
 [{"sid":"1","service":"Point to Point"},{"sid":"2","service":"Outstation"},{"sid":"3","service":"Hourly Package"},{"sid":"4","service":"Cab Here (Coming soon)"}]
 
+
+------------------------------------------------------------------------------------------------------------
+Title : Cab services
+URL : {base_url}/cabtypes
+Method : GET
+
+1.
+Status code : 200
+Response :
+
+[{"ctid":"1","ctype":"Economic"},{"ctid":"2","ctype":"Premium"}]
+
 ------------------------------------------------------------------------------------------------------------
 Title : Vendor Update details
 URL : {base_url}/vendor/updatedetails/{vendor_id}
@@ -378,6 +390,7 @@ URL : {base_url}/vendor/changepassword/{vendor_id}
 Method : PUT
 Request
 {
+    "opassword": "12345",
     "password": "12345"
 }
 
@@ -389,6 +402,13 @@ Response :
 ------------------------------------------------------------------------------------------------------------
 Title : Vendor bookings by id
 URL : {base_url}/vendor/bookings/{vendor_id}
+Method : GET
+
+Response :
+
+------------------------------------------------------------------------------------------------------------
+Title : Vendor services by id
+URL : {base_url}/vendor/services/{vendor_id}
 Method : GET
 
 Response :

@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 30, 2015 at 05:40 AM
+-- Generation Time: Jul 01, 2015 at 08:05 PM
 -- Server version: 5.6.21
 -- PHP Version: 5.6.3
 
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS `rocbookinginfo` (
   `rocbookingdatetime` datetime NOT NULL,
   `rocvendorid` int(11) NOT NULL,
   `rocbookingstatus` varchar(45) NOT NULL DEFAULT 'active'
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -61,6 +61,29 @@ CREATE TABLE IF NOT EXISTS `roccabservices` (
   `createduser` varchar(45) DEFAULT NULL,
   `modifieduser` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `roccabtypes`
+--
+
+CREATE TABLE IF NOT EXISTS `roccabtypes` (
+`roccabtypeid` int(11) NOT NULL,
+  `roccabtype` varchar(60) NOT NULL,
+  `createdtime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `createdby` int(11) NOT NULL,
+  `updatedtime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `updatedby` int(11) NOT NULL
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `roccabtypes`
+--
+
+INSERT INTO `roccabtypes` (`roccabtypeid`, `roccabtype`, `createdtime`, `createdby`, `updatedtime`, `updatedby`) VALUES
+(1, 'Economic', '2015-07-01 17:19:49', 0, '0000-00-00 00:00:00', 0),
+(2, 'Premium', '2015-07-01 17:19:49', 0, '0000-00-00 00:00:00', 0);
 
 -- --------------------------------------------------------
 
@@ -206,6 +229,8 @@ CREATE TABLE IF NOT EXISTS `rocvendors` (
   `rocvendorslocation` varchar(60) NOT NULL,
   `rocvendortlproof` varchar(60) NOT NULL,
   `rocvendortcards` varchar(60) NOT NULL,
+  `rocvendortarrif` varchar(225) NOT NULL,
+  `rocvendorlandline` varchar(20) NOT NULL,
   `createddate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `modifieddate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `createduser` varchar(45) DEFAULT 'Admin',
@@ -217,9 +242,9 @@ CREATE TABLE IF NOT EXISTS `rocvendors` (
 -- Dumping data for table `rocvendors`
 --
 
-INSERT INTO `rocvendors` (`rocvendorid`, `rocvendorname`, `rocvendoraddress`, `rocvendoremail`, `rocvendornumber1`, `rocvendornumber2`, `rocvendorusername`, `rocvendorpassword`, `rocvendorcontactperson`, `rocvendorlogo`, `rocvendorexp`, `rocvendornocif`, `rocvendorfname`, `rocvendorfemail`, `rocvendorslocation`, `rocvendortlproof`, `rocvendortcards`, `createddate`, `modifieddate`, `createduser`, `modifieduser`, `rocvendorrating`) VALUES
-(11, 'Venkateshwara Travels', 'mothi nager, hyderabad', 'venkateswara@gmail.com', '9738134646', '7569508597', 'venkateswara@gmail.com', '123456', 'venkata', 'NA', 3, 10, 'uday', 'uday@gmail.com', 'Hyderabad', '123456', '12345', '2015-06-25 17:56:10', '0000-00-00 00:00:00', 'Admin', 'Admin', NULL),
-(12, 'OLA Cab', '', 'ola@gmail.com', '9849434343', '', 'ola@gmail.com', '123456', '', '', 0, 0, '', '', '', '', '', '2015-06-25 18:09:27', '0000-00-00 00:00:00', 'Admin', 'Admin', NULL);
+INSERT INTO `rocvendors` (`rocvendorid`, `rocvendorname`, `rocvendoraddress`, `rocvendoremail`, `rocvendornumber1`, `rocvendornumber2`, `rocvendorusername`, `rocvendorpassword`, `rocvendorcontactperson`, `rocvendorlogo`, `rocvendorexp`, `rocvendornocif`, `rocvendorfname`, `rocvendorfemail`, `rocvendorslocation`, `rocvendortlproof`, `rocvendortcards`, `rocvendortarrif`, `rocvendorlandline`, `createddate`, `modifieddate`, `createduser`, `modifieduser`, `rocvendorrating`) VALUES
+(11, 'Venkateshwara Travels', 'mothi nager, hyderabad', 'venkateswara@gmail.com', '9738134646', '7569508597', 'venkateswara@gmail.com', '123456', 'venkata', 'NA', 3, 10, 'uday', 'uday@gmail.com', 'Hyderabad', '123456', '12345', '', '', '2015-06-25 17:56:10', '0000-00-00 00:00:00', 'Admin', 'Admin', NULL),
+(12, 'OLA Cab', '', 'ola@gmail.com', '9849434343', '', 'ola@gmail.com', '123456', '', '', 0, 0, '', '', '', '', '', '', '', '2015-06-25 18:09:27', '0000-00-00 00:00:00', 'Admin', 'Admin', NULL);
 
 -- --------------------------------------------------------
 
@@ -252,6 +277,12 @@ ALTER TABLE `rocbookinginfo`
 --
 ALTER TABLE `roccabservices`
  ADD PRIMARY KEY (`roccabservicesid`);
+
+--
+-- Indexes for table `roccabtypes`
+--
+ALTER TABLE `roccabtypes`
+ ADD PRIMARY KEY (`roccabtypeid`);
 
 --
 -- Indexes for table `roccoupons`
@@ -309,12 +340,17 @@ ALTER TABLE `rocvendorterms`
 -- AUTO_INCREMENT for table `rocbookinginfo`
 --
 ALTER TABLE `rocbookinginfo`
-MODIFY `rocbookinginfoid` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=31;
+MODIFY `rocbookinginfoid` int(11) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `roccabservices`
 --
 ALTER TABLE `roccabservices`
 MODIFY `roccabservicesid` int(11) NOT NULL AUTO_INCREMENT;
+--
+-- AUTO_INCREMENT for table `roccabtypes`
+--
+ALTER TABLE `roccabtypes`
+MODIFY `roccabtypeid` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT for table `roccoupons`
 --

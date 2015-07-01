@@ -2,6 +2,7 @@
 include 'db.php';
 include 'user.php';
 include 'vendor.php';
+include 'admin.php';
 /**
  * Step 1: Require the Slim Framework
  *
@@ -275,6 +276,18 @@ $app->put(
 			}
 			else {
 				$fields['password'] = "password required";
+				$error = TRUE;
+			}
+
+			// checking old password is empty or not 
+			if(isset($request_data->opassword)) {
+				if(!v::string()->notEmpty()->validate($request_data->opassword)) {
+					$fields['opassword'] = "Old password should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['opassword'] = "Old password required";
 				$error = TRUE;
 			}
 
@@ -806,10 +819,10 @@ $app->put(
 			}
 			// checking number2 is empty or not 
 			if(isset($request_data->number2)) {
-				if(!v::string()->notEmpty()->validate($request_data->number2)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->number2)) {
 					$fields['number2'] = "Number2 should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			}
 			else {
 				$fields['number2'] = "Number2 required";
@@ -839,10 +852,10 @@ $app->put(
 			}
 			// checking experience is empty or not 
 			if(isset($request_data->exp)) {
-				if(!v::string()->notEmpty()->validate($request_data->exp)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->exp)) {
 					$fields['exp'] = "Experience should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			}
 			else {
 				$fields['exp'] = "Experience required";
@@ -850,10 +863,10 @@ $app->put(
 			}
 			// checking No of cabs in fleet is empty or not 
 			if(isset($request_data->nocif)) {
-				if(!v::string()->notEmpty()->validate($request_data->nocif)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->nocif)) {
 					$fields['nocif'] = "No of cabs in fleet should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			}
 			else {
 				$fields['nocif'] = "No of cabs in fleet required";
@@ -861,10 +874,10 @@ $app->put(
 			}
 			// checking Founder Name is empty or not 
 			if(isset($request_data->fname)) {
-				if(!v::string()->notEmpty()->validate($request_data->fname)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->fname)) {
 					$fields['fname'] = "Founder Name should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			}
 			else {
 				$fields['fname'] = "Founder Name required";
@@ -872,10 +885,10 @@ $app->put(
 			}
 			// checking Founder Email is empty or not 
 			if(isset($request_data->femail)) {
-				if(!v::string()->notEmpty()->validate($request_data->femail)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->femail)) {
 					$fields['femail'] = "Founder Email should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			}
 			else {
 				$fields['femail'] = "Founder Email required";
@@ -883,10 +896,10 @@ $app->put(
 			}
 			// checking Service Location is empty or not 
 			if(isset($request_data->slocation)) {
-				if(!v::string()->notEmpty()->validate($request_data->slocation)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->slocation)) {
 					$fields['slocation'] = "Service Location should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			}
 			else {
 				$fields['slocation'] = "Service Location required";
@@ -894,10 +907,10 @@ $app->put(
 			}
 			// checking  travel licence proof is empty or not 
 			if(isset($request_data->tlproof)) {
-				if(!v::string()->notEmpty()->validate($request_data->tlproof)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->tlproof)) {
 					$fields['tlproof'] = " Travel licence proof should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			}
 			else {
 				$fields['tlproof'] = "Travel licence proof required";
@@ -905,13 +918,35 @@ $app->put(
 			}
 			// checking  tarrif cards is empty or not 
 			if(isset($request_data->tcards)) {
-				if(!v::string()->notEmpty()->validate($request_data->tcards)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->tcards)) {
 					$fields['tcards'] = " Tarrif cards should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			}
 			else {
 				$fields['tcards'] = "Tarrif cards proof required";
+				$error = TRUE;
+			}
+			// checking  tarrif is empty or not 
+			if(isset($request_data->tarrif)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->tarrif)) {
+					$fields['tarrif'] = " Tarrif should not be empty";
+					$error = TRUE;
+				}*/
+			}
+			else {
+				$fields['tarrif'] = "Tarrif required";
+				$error = TRUE;
+			}
+			// checking  vendor landline number is empty or not 
+			if(isset($request_data->landline)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->landline)) {
+					$fields['tcards'] = "Landline number should not be empty";
+					$error = TRUE;
+				}*/
+			}
+			else {
+				$fields['landline'] = "Landline number proof required";
 				$error = TRUE;
 			}
 			// Checking is validation there
@@ -968,6 +1003,18 @@ $app->put(
 			}
 			else {
 				$fields['password'] = "password required";
+				$error = TRUE;
+			}
+
+			// checking old password is empty or not 
+			if(isset($request_data->opassword)) {
+				if(!v::string()->notEmpty()->validate($request_data->opassword)) {
+					$fields['opassword'] = "Old password should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['opassword'] = "Old password required";
 				$error = TRUE;
 			}
 
@@ -1121,6 +1168,26 @@ $app->post(
 	}
 );
 
+// vendor terms and conditions by vendor id
+$app->get(
+	'/vendor/terms/:vendorid',
+	function($vendorid) use($app) {
+		$response_data = get_vendorterms($vendorid);
+		// checking is vendor id available or not
+    if($response_data == '[]') {
+    	// if terms not aavailable with vendorid throw 404
+    	$app->response->setStatus(404);
+    	echo $response_data;
+    }
+    else {
+    	// if terms available throw terms data
+    	$json_data = json_decode($response_data);
+    	$user_data = $json_data[0];	// swapping first array object
+			echo json_encode($user_data);
+    }
+	}
+);
+
 // vendor terms and conditions
 $app->post(
 	'/vendor/terms',
@@ -1188,6 +1255,14 @@ $app->get(
   }
 );
 
+// GET cab types route
+$app->get(
+  '/cabtypes',
+  function () use ($app) {
+    echo $response_data = cabtypes_data();
+  }
+);
+
 // GET cab bookings by vendor id route
 $app->get(
   '/vendor/bookings/:vendorid',
@@ -1195,6 +1270,23 @@ $app->get(
     echo $response_data = vendor_bookings($vendorid);
   }
 );
+
+// GET manage services by vendor id route
+$app->get(
+  '/vendor/services/:vendorid',
+  function ($vendorid) use ($app) {
+    echo $response_data = vendor_services($vendorid);
+  }
+);
+
+// GET registered users route
+$app->get(
+  '/admin/users',
+  function () use ($app) {
+    users_list();
+  }
+);
+
 
 $app->contentType('application/json');
 /**

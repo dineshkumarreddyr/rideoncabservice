@@ -127,17 +127,34 @@ function user_login($loginData) {
  */
 function user_changepassword($passwordData, $rocuserid) {
 	$passwordData = json_decode($passwordData);
-	$sql = "UPDATE rocusers SET rocuserpassword = :rocuserpassword WHERE rocuserid = :rocuserid";
+	$sql = "SELECT rocuserpassword FROM rocusers WHERE rocuserid = :rocuserid";
 	try {
 		$db = getDB();
-		$stmt = $db->prepare($sql);  
-		$stmt->bindParam(":rocuserpassword", $passwordData->password);
+		$stmt = $db->prepare($sql);
 		$stmt->bindParam(":rocuserid", $rocuserid);
 		$stmt->execute();
+		$user_data = $stmt->fetch(PDO::FETCH_OBJ);
 		$db = null;
-
-		if($stmt->rowCount()) {
-			return "Password successfully updated";
+		if(count($user_data)) {
+			if($user_data->rocuserpassword == $passwordData->opassword) {
+				$sql = "UPDATE rocusers SET rocuserpassword = :rocuserpassword WHERE rocuserid = :rocuserid";
+				$db = getDB();
+				$stmt = $db->prepare($sql);  
+				$stmt->bindParam(":rocuserpassword", $passwordData->password);
+				$stmt->bindParam(":rocuserid", $rocuserid);
+				$stmt->execute();
+				if($stmt->rowCount()) {
+					return "Password successfully updated";
+				}
+				else {
+					$status_data = array("error" => "Invalid", "error_description" => "Password updating failed");
+					return json_encode($status_data);
+				}
+			}
+			else {
+				$status_data = array("error" => "Invalid", "error_description" => "Invalid Old Password");
+				return json_encode($status_data);
+			}
 		}
 		else {
 			$status_data = array("error" => "Invalid", "error_description" => "Invalid user");
