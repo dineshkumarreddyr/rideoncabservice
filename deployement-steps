@@ -297,11 +297,13 @@ Request :
     "vid": "1",
     "prices": [
         {
+            "ctype": "1",
             "vcmid": "12",
             "cpkm": "100",
             "csid": "123"
         },
         {
+            "ctype": "2",
             "vcmid": "123",
             "cpkm": "150",
             "csid": "133"
@@ -349,7 +351,7 @@ Response :
 
 
 ------------------------------------------------------------------------------------------------------------
-Title : Cab services
+Title : Cab types
 URL : {base_url}/cabtypes
 Method : GET
 

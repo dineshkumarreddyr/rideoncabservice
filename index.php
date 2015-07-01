@@ -241,9 +241,9 @@ $app->post(
 				}
 				else {
 					//$json_data = json_decode($response_data);
-	    			$user_data = $response_json_data[0];	// swapping first array object
-	    			echo json_encode($user_data);
-	    		}
+    			$user_data = $response_json_data[0];	// swapping first array object
+    			echo json_encode($user_data);
+    		}
 			}
 		}
 	}
@@ -355,7 +355,7 @@ $app->post(
 				}
 			}
 			else {
-				$fields['cabtype'] = "Cab type required";
+				$fields['servicetype'] = "Service type required";
 				$error = TRUE;
 			}
 			
@@ -757,9 +757,17 @@ $app->post(
 			else {
 				// If no validation errors
 				$response_data = vendor_login($request->getBody());
-				$json_data = json_decode($response_data);
-	    	$vendor_data = $json_data;	// swapping first array object
-	    	echo json_encode($vendor_data);
+				$response_json_data = json_decode($response_data);
+	    	// checking is vendor successfully logggedin or not
+				if(isset($response_json_data->error)) {
+					$app->response->setStatus(401);
+					echo $response_data;
+				}
+				else {
+					//$json_data = json_decode($response_data);
+    			$vendor_data = $response_json_data[0];	// swapping first array object
+    			echo json_encode($vendor_data);
+    		}
 			}
 		}
 	}

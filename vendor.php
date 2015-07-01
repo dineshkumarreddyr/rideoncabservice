@@ -151,7 +151,7 @@ function vendor_login($loginData) {
  */
 function vendor_data($rocvendorid, $mode = 'mini') {
 	if($mode == 'full') {
-		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendorcontactperson as contactperson, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendoraddress as address, rocvendoremail as email, rocvendorexp as exp, rocvendornocif as nocif, rocvendorfname as fname, rocvendorfemail as femail, rocvendorslocation as slocation, rocvendortlproof as rlproof, rocvendortcards as tcards, rocvendortarrif as tarrif, rocvendorlandline as landline FROM rocvendors WHERE  rocvendorid = :rocvendorid";
+		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendorcontactperson as contactperson, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendoraddress as address, rocvendoremail as email, rocvendorexp as exp, rocvendornocif as nocif, rocvendorfname as fname, rocvendorfemail as femail, rocvendorslocation as slocation, rocvendortlproof as tlproof, rocvendortcards as tcards, rocvendortarrif as tarrif, rocvendorlandline as landline FROM rocvendors WHERE  rocvendorid = :rocvendorid";
 	}
 	else {
 		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendoraddress as address, rocvendoremail as email, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendorusername as username, rocvendorcontactperson as contactperson, rocvendorlogo as logo FROM rocvendors WHERE  rocvendorid = :rocvendorid";
@@ -340,6 +340,17 @@ function insert_vendorprices($vendorprices) {
 	$prices = $vendorprices->prices;
 	foreach($prices as $price) {
 		$error = FALSE;
+		
+		// checking cab type id is empty or not 
+		if(isset($price->ctype)) {
+			if(empty($price->ctype)) {
+				$error = TRUE;
+			}
+		}
+		else {
+			$error = TRUE;
+		}
+
 		// checking cab model id is empty or not 
 		if(isset($price->vcmid)) {
 			if(empty($price->vcmid)) {
@@ -370,10 +381,11 @@ function insert_vendorprices($vendorprices) {
 
 		// Checking is validation errors there
 		if(!$error) {
-			$sql = "INSERT INTO rocvendorcharges(roccabmodelid, rocchargeperkm, roccabservicesid, rocvendorid) VALUES(:roccabmodelid, :rocchargeperkm, :roccabservicesid, :rocvendorid)";
+			$sql = "INSERT INTO rocvendorcharges(roccabtype, roccabmodelid, rocchargeperkm, roccabservicesid, rocvendorid) VALUES(:roccabtype, :roccabmodelid, :rocchargeperkm, :roccabservicesid, :rocvendorid)";
 			try {
 				$db = getDB();
 				$stmt = $db->prepare($sql); 
+				$stmt->bindParam("roccabtype", $price->ctype);
 				$stmt->bindParam("roccabmodelid", $price->vcmid);
 				$stmt->bindParam("rocchargeperkm", $price->cpkm);
 				$stmt->bindParam("roccabservicesid", $price->csid);
@@ -402,7 +414,7 @@ function get_vendorterms($vendorid) {
 		$stmt->execute();
 		$terms_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
-		return json_encode($terms_data)
+		return json_encode($terms_data);
 	} catch(PDOException $e) {
 		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
 		return '{"error":{"text":"'. $e->getMessage() .'""}}'; 
