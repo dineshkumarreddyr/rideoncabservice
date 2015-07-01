@@ -765,7 +765,7 @@ $app->post(
 				}
 				else {
 					//$json_data = json_decode($response_data);
-    			$vendor_data = $response_json_data[0];	// swapping first array object
+    			$vendor_data = $response_json_data;	// swapping first array object
     			echo json_encode($vendor_data);
     		}
 			}
