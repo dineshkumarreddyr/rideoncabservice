@@ -450,6 +450,30 @@ function insert_vendorterms($vendorterms) {
 }
 
 /*
+ * update vendor terms and conditions
+ */
+function update_vendorterms($vendorterms) {
+	$vendorterms = json_decode($vendorterms);
+	$vendor_id = $vendorterms->vid;
+	$content = $vendorterms->content;
+	$sql = "UPDATE rocvendorterms SET rocvendorterms = :rocvendorterms WHERE rocvendorid = :rocvendorid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->bindParam("rocvendorid", $vendor_id);
+		$stmt->bindParam("rocvendorterms", $content);
+		$stmt->execute();
+		$db = null;
+		$status_data = array("result" => "success", "message" => "Successfully updated");
+		return json_encode($status_data);
+	} catch(PDOException $e) {
+		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"text":"'. $e->getMessage() .'""}}'; 
+		//break;
+	}
+}
+
+/*
  * Getting cab services data
  */
 function cabservices_data() {

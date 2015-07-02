@@ -1255,6 +1255,65 @@ $app->post(
 	}
 );
 
+// update vendor terms and conditions
+$app->put(
+	'/vendor/terms',
+	function() use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+			);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$request_data = json_decode($request_data);
+			$fields = array(); // error fields array creation
+			$error = FALSE; // validation error checking variable
+			// checking vendor id is empty or not 
+			if(isset($request_data->vid)) {
+				if(!v::string()->notEmpty()->validate($request_data->vid)) {
+					$fields['vid'] = "Vendor id should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['vid'] = "Vendor id required";
+				$error = TRUE;
+			}
+			// checking terms content is empty or not 
+			if(isset($request_data->content)) {
+				if(!v::string()->notEmpty()->validate($request_data->content)) {
+					$fields['content'] = "Content should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['content'] = "Content required";
+				$error = TRUE;
+			}
+
+			// Checking is validation errors there
+			if($error) {
+				// If any validation errors
+				$response = array(
+					'error' => 'validation',
+					'fields' => $fields
+				);
+				$app->response->setStatus(400);
+				echo json_encode($response);
+			}
+			else {
+				// If no validation errors
+				echo $response_data = update_vendorterms($request->getBody());
+			}
+		}
+	}
+);
+
 // GET cab services route
 $app->get(
   '/cabservices',
