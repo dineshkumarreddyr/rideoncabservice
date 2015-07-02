@@ -549,12 +549,17 @@ function vendor_bookings($vendorid) {
  */
 function vendor_services($vendorid) {
 	$sql = "SELECT 
-	rocvendorchargeid as vcid, 
-	roccabtype as vctype, 
-	roccabmodelid as vcmid, 
-	rocchargeperkm as cpkm, 
-	roccabservicesid as csid 
-	FROM rocvendorcharges WHERE rocvendorid = :rocvendorid";
+	vc.rocvendorchargeid as vcid, 
+	vc.roccabtype as vctype, 
+	ct.roccabtype as cabtype, 
+	vc.roccabmodelid as vcmid, 
+	vc.rocchargeperkm as cpkm, 
+	vc.roccabservicesid as csid, 
+	cs.roccabservices as cabservice 
+	FROM rocvendorcharges vc, roccabtypes ct, roccabservices cs WHERE 
+	vc.rocvendorid = :rocvendorid AND 
+	vc.roccabtype = ct.roccabtypeid AND 
+	vc.roccabservicesid = cs.roccabservicesid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql);
