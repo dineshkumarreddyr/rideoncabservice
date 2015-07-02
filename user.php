@@ -144,7 +144,8 @@ function user_changepassword($passwordData, $rocuserid) {
 				$stmt->bindParam(":rocuserid", $rocuserid);
 				$stmt->execute();
 				if($stmt->rowCount()) {
-					return "Password successfully updated";
+					$status_data = array("result" => "success", "message" => "Password successfully updated");
+					return json_encode($status_data);
 				}
 				else {
 					$status_data = array("error" => "Invalid", "error_description" => "Password updating failed");

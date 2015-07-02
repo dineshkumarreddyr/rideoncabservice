@@ -236,7 +236,8 @@ function vendor_changepassword($passwordData, $rocvendorid) {
 				$stmt->bindParam(":rocvendorid", $rocvendorid);
 				$stmt->execute();
 				if($stmt->rowCount()) {
-					return "Password successfully updated";
+					$status_data = array("result" => "success", "message" => "Password successfully updated");
+					return json_encode($status_data);
 				}
 				else {
 					$status_data = array("error" => "Invalid", "error_description" => "Password updating failed");
@@ -304,7 +305,8 @@ function insert_vendorservices($vendorservices) {
 			}
 		}
 	}
-	return 'Successfully updated';
+	$status_data = array("result" => "success", "message" => "Successfully updated");
+	return json_encode($status_data);
 }
 
 function vendor_cabmodel_data($vendor_id) {
@@ -399,7 +401,8 @@ function insert_vendorprices($vendorprices) {
 			}
 		}
 	}
-	return 'Successfully updated';
+	$status_data = array("result" => "success", "message" => "Successfully updated");
+	return json_encode($status_data);
 }
 
 /*
@@ -437,7 +440,8 @@ function insert_vendorterms($vendorterms) {
 		$stmt->bindParam("rocvendorterms", $content);
 		$stmt->execute();
 		$db = null;
-		return 'Successfully inserted';
+		$status_data = array("result" => "success", "message" => "Successfully inserted");
+		return json_encode($status_data);
 	} catch(PDOException $e) {
 		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
 		return '{"error":{"text":"'. $e->getMessage() .'""}}'; 
