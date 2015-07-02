@@ -1354,6 +1354,14 @@ $app->get(
   }
 );
 
+// GET registered users route
+$app->get(
+  '/admin/vendors',
+  function () use ($app) {
+    vendors_list();
+  }
+);
+
 
 $app->contentType('application/json');
 /**
