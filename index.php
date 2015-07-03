@@ -1454,7 +1454,7 @@ $app->put(
 $app->get(
   '/cabservices',
   function () use ($app) {
-    echo $response_data = cabservices_data();
+    cabservices_data($app);
   }
 );
 
@@ -1462,7 +1462,7 @@ $app->get(
 $app->get(
   '/cabtypes',
   function () use ($app) {
-    echo $response_data = cabtypes_data();
+    cabtypes_data($app);
   }
 );
 
@@ -1470,7 +1470,7 @@ $app->get(
 $app->get(
   '/vendor/bookings/:vendorid',
   function ($vendorid) use ($app) {
-    echo $response_data = vendor_bookings($vendorid);
+    vendor_bookings($app, $vendorid);
   }
 );
 
@@ -1486,7 +1486,7 @@ $app->get(
 $app->get(
   '/admin/users',
   function () use ($app) {
-    users_list();
+    users_list($app);
   }
 );
 
@@ -1494,7 +1494,15 @@ $app->get(
 $app->get(
   '/admin/vendors',
   function () use ($app) {
-    vendors_list();
+    vendors_list($app);
+  }
+);
+
+// GET registered users route
+$app->get(
+  '/admin/bookings',
+  function () use ($app) {
+    bookings_list($app);
   }
 );
 

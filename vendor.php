@@ -476,7 +476,7 @@ function update_vendorterms($vendorterms) {
 /*
  * Getting cab services data
  */
-function cabservices_data() {
+function cabservices_data($app) {
 	$sql = "SELECT roccabservicesid as sid, roccabservices as service FROM roccabservices";
 	try {
 		$db = getDB();
@@ -484,18 +484,19 @@ function cabservices_data() {
 		$stmt->execute();		
 		$services_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
-		return json_encode($services_data);
-		
+		echo json_encode($services_data);
+		$app->response->setStatus(200);
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
 	}
 }
 
 /*
  * Getting cab type data
  */
-function cabtypes_data() {
+function cabtypes_data($app) {
 	$sql = "SELECT roccabtypeid as ctid, roccabtype as ctype FROM roccabtypes";
 	try {
 		$db = getDB();
@@ -503,18 +504,19 @@ function cabtypes_data() {
 		$stmt->execute();		
 		$services_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
-		return json_encode($services_data);
-		
+		echo json_encode($services_data);
+		$app->response->setStatus(200);
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
 	}
 }
 
 /*
  * Getting all bookings by vendor for vendor manage bookings
  */
-function vendor_bookings($vendorid) {
+function vendor_bookings($app, $vendorid) {
 	$sql = "SELECT 
 	rocbookinginfoid as bookingid, 
 	rocservicetype as servicetype, 
@@ -530,17 +532,13 @@ function vendor_bookings($vendorid) {
 		$bookings_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
 		$count = count($bookings_data);
-		if($count) {
-			$bookings_data = array("total" => $count, "results" => $bookings_data);
-			return json_encode($bookings_data);
-		}
-		else {
-			$bookings_data = array("total" => 0, "results" => array());
-			return json_encode($bookings_data);
-		}
+		$bookings_data = array("total" => 0, "results" => array());
+		echo json_encode($bookings_data);
+		$app->response->setStatus(200);
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}';
+		$app->response->setStatus(500); 
 	}
 }
 
