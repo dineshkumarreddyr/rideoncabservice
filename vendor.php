@@ -579,4 +579,48 @@ function vendor_services($vendorid) {
 		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
 	}
 }
+
+/*
+ * Delete vendor by vendorid
+ */
+function vendor_delete($app, $rocvendorid = 0) {
+	$sql = "DELETE FROM rocvendors WHERE  rocvendorid = :rocvendorid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->bindParam("rocvendorid", $rocvendorid);
+		$stmt->execute();		
+		$db = null;
+		$status_data = array("result" => "success", "message" => "Vendor successfully Deleted");
+		echo json_encode($status_data);
+		$app->response->setStatus(200);
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"message":"'. $e->getMessage() .'"}}';
+		$app->response->setStatus(500);
+	}
+}
+
+/*
+ * Delete vendor terms by vendorid and termid
+ */
+function terms_delete($app, $vendorid = 0, $termid = 0) {
+	$sql = "DELETE FROM rocvendorterms WHERE  rocvendorid = :rocvendorid AND rocvendortermsid = :rocvendortermsid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->bindParam("rocvendorid", $vendorid);
+		$stmt->bindParam("rocvendortermsid", $termid);
+		$stmt->execute();		
+		$db = null;
+		$status_data = array("result" => "success", "message" => "Vendor successfully Deleted");
+		echo json_encode($status_data);
+		$app->response->setStatus(200);
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"message":"'. $e->getMessage() .'"}}';
+		$app->response->setStatus(500);
+	}
+}
+
 ?>

@@ -166,4 +166,82 @@ function user_changepassword($passwordData, $rocuserid) {
 		return '{"error":{"text":"'. $e->getMessage() .'"}}'; 
 	}
 }
+
+/*
+ * Delete user by userid
+ */
+function user_delete($app, $rocuserid = 0) {
+	$sql = "DELETE FROM rocusers WHERE  rocuserid = :rocuserid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->bindParam("rocuserid", $rocuserid);
+		$stmt->execute();		
+		$db = null;
+		$status_data = array("result" => "success", "message" => "User successfully Deleted");
+		echo json_encode($status_data);
+		$app->response->setStatus(200);
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"message":"'. $e->getMessage() .'"}}';
+		$app->response->setStatus(500);
+	}
+}
+
+/*
+ * Register user while book cab
+ */
+function user_register($app, $register_data) {
+	$parsed_data = json_decode($register_data);
+	// checking is loggedin user data or not 
+	if(isset($parsed_data->uid)) {
+		echo "loggedin";
+	}
+	else {
+		echo "not loggedin";
+		if(signUpCheck($register_data)) {
+			// if already registered user
+			$sql = "SELECT rocuserid FROM rocusers WHERE rocuseremail = :rocuseremail";
+			$db = getDB();
+			$stmt = $db->prepare($sql); 
+			$stmt->bindParam("rocuseremail", $parsed_data->email);
+			$stmt->execute();
+			$user_data = $stmt->fetch(PDO::FETCH_OBJ);
+			$db = null;
+
+			$userid = $user_data->rocuserid;
+			user_updatedetails($userid, $register_data);
+		}
+		else {
+			// if not registered user
+		}
+	}
+	$app->response->setStatus(200);
+}
+
+/*
+ * User update details
+ */
+function user_updatedetails($userid, $updateDetails) {
+	$updateDetails = json_decode($updateDetails);
+	$sql = "UPDATE rocusers SET rocuserfirstname = :rocuserfirstname, rocuserlastname = :rocuserlastname, rocuseremail = :rocuseremail, rocusercity = :rocusercity, rocuserstate = :rocuserstate, rocusermobile = :rocusermobile WHERE rocuserid = :rocuserid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);  
+		$stmt->bindParam(":rocuserfirstname", $updateDetails->fname);
+		$stmt->bindParam(":rocuserlastname", $updateDetails->lname);
+		$stmt->bindParam(":rocuseremail", $updateDetails->email);
+		$stmt->bindParam(":rocusercity", $updateDetails->city);
+		$stmt->bindParam(":rocuserstate", $updateDetails->state);
+		$stmt->bindParam(":rocusermobile", $updateDetails->mobile);
+		$stmt->bindParam(":rocuserid", $userid);
+
+		$stmt->execute();
+		$db = null;
+		return user_data($userid);
+	} catch(PDOException $e) {
+		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+	}
+}
 ?>

@@ -59,6 +59,14 @@ $app->get(
   }
 );
 
+// Delete User by userid route
+$app->delete(
+	'/user/:rocuserid',
+	function ($rocuserid) use ($app) {
+		user_delete($app, $rocuserid);
+	}
+);
+
 
 // User signUp route
 $app->post(
@@ -298,8 +306,8 @@ $app->post(
 				echo json_encode($response);
 			}
 			else {
-				// // If no validation errors
-				// $response_data = user_signUp($request->getBody());
+				// If no validation errors
+				echo $response_data = user_register($app, $request->getBody());
 				// $response_json_data = json_decode($response_data);
 				// // checking is user successfully created or not
 				// if(isset($response_json_data->error)) {
@@ -911,6 +919,13 @@ $app->post(
 	}
 );
 
+// Delete vendor by vendorid route
+$app->delete(
+	'/vendor/:rocvendorid',
+	function ($rocvendorid) use ($app) {
+		vendor_delete($app, $rocvendrid);
+	}
+);
 
 // Vendor update details route
 $app->put(
@@ -1332,6 +1347,14 @@ $app->get(
 	}
 );
 
+// Delete User by userid route
+$app->delete(
+	'/vendor/terms/:vendorid/:termid',
+	function ($vendorid, $termid) use ($app) {
+		terms_delete($app, $vendorid, $termid);
+	}
+);
+
 // vendor terms and conditions
 $app->post(
 	'/vendor/terms',
@@ -1498,7 +1521,7 @@ $app->get(
   }
 );
 
-// GET registered users route
+// GET bookings list route
 $app->get(
   '/admin/bookings',
   function () use ($app) {
