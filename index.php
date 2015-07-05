@@ -1474,6 +1474,17 @@ $app->put(
 				$fields['vid'] = "Vendor id required";
 				$error = TRUE;
 			}
+			// checking vendor term id is empty or not 
+			if(isset($request_data->termid)) {
+				if(!v::string()->notEmpty()->validate($request_data->termid)) {
+					$fields['termid'] = "Vendor term id should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['termid'] = "Vendor term id required";
+				$error = TRUE;
+			}
 			// checking terms cab model is empty or not 
 			if(isset($request_data->cabmodel)) {
 				if(!v::string()->notEmpty()->validate($request_data->cabmodel)) {

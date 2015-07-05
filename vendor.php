@@ -585,13 +585,15 @@ function insert_vendorterms($vendorterms) {
 function update_vendorterms($vendorterms) {
 	$vendorterms = json_decode($vendorterms);
 	$vendor_id = $vendorterms->vid;
+	$term_id = $vendorterms->termid;
 	$content = $vendorterms->cabmodel;
 	$content = $vendorterms->content;
-	$sql = "UPDATE rocvendorterms SET roccabmodelid =:roccabmodelid, rocvendorterms = :rocvendorterms WHERE rocvendorid = :rocvendorid";
+	$sql = "UPDATE rocvendorterms SET roccabmodelid =:roccabmodelid, rocvendorterms = :rocvendorterms WHERE rocvendorid = :rocvendorid AND rocvendortermsid = :rocvendortermsid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
 		$stmt->bindParam("rocvendorid", $vendor_id);
+		$stmt->bindParam("rocvendortermsid", $term_id);
 		$stmt->bindParam("roccabmodelid", $cabmodel);
 		$stmt->bindParam("rocvendorterms", $content);
 		$stmt->execute();
