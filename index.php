@@ -686,8 +686,8 @@ $app->post(
 			}
 			else {
 				// If no validation errors
-				$response_data = bookCab($request->getBody());
-				$response_json_data = json_decode($response_data);
+				bookCab($app, $request->getBody());
+				/*$response_json_data = json_decode($response_data);
 				// checking is cab successfully booked or not
 				if(isset($response_json_data->error)) {
 					$app->response->setStatus(409);
@@ -697,7 +697,7 @@ $app->post(
 					// book cab and throw booking id
 					$app->response->setStatus(201);
 					echo $response_data;
-				}
+				}*/
 			}
 		}
 	}
@@ -1550,14 +1550,6 @@ $app->get(
   }
 );
 
-// GET cab bookings by vendor id route
-$app->get(
-  '/vendor/bookings/:vendorid',
-  function ($vendorid) use ($app) {
-    vendor_bookings($app, $vendorid);
-  }
-);
-
 // GET manage services by vendor id route
 $app->get(
   '/vendor/services/:vendorid',
@@ -1590,7 +1582,23 @@ $app->get(
   }
 );
 
-// GET bookings list route
+// GET user bookings list route
+$app->get(
+  '/user/bookings/:userid',
+  function ($userid) use ($app) {
+    user_bookings_list($app, $userid);
+  }
+);
+
+// GET admin bookings list route
+$app->get(
+  '/vendor/bookings/:vendorid',
+  function ($vendorid) use ($app) {
+    vendor_bookings_list($app, $vendorid);
+  }
+);
+
+// GET admin bookings list route
 $app->get(
   '/admin/bookings',
   function () use ($app) {

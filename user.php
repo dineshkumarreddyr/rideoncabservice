@@ -26,20 +26,21 @@ function user_signUp($signUpData) {
 	if(!signUpCheck($signUpData)) {
 		$signUpData = json_decode($signUpData);
 		// checking password is empty or not. if empty set default random password
-		if(isset($signUpData->password)) {
-			if(!v::string()->notEmpty()->validate($signUpData->password)) {
-				$signUpData->password = rand(00000, 99999);
-			}
+		if(!isset($signUpData->password)) {
+			$signUpData->password = rand(00000, 99999);
 		}
-		$sql = "INSERT INTO rocusers (rocuserfirstname, rocuserlastname, rocuseremail, rocusercity, rocuserstate, rocusermobile, rocuserpassword) VALUES (:rocuserfirstname, :rocuserlastname, :rocuseremail, :rocusercity, :rocuserstate, :rocusermobile, :rocuserpassword)";
+		$sql = "INSERT INTO rocusers (rocuserfirstname, rocuserlastname, rocuseremail, rocuseraddress1, rocuseraddress2, rocusercity, rocuserstate, rocuserpincode, rocusermobile, rocuserpassword) VALUES (:rocuserfirstname, :rocuserlastname, :rocuseremail, :rocuseraddress1, :rocuseraddress2, :rocusercity, :rocuserstate, :rocuserpincode, :rocusermobile, :rocuserpassword)";
 		try {
 			$db = getDB();
 			$stmt = $db->prepare($sql);  
 			$stmt->bindParam(":rocuserfirstname", $signUpData->fname);
 			$stmt->bindParam(":rocuserlastname", $signUpData->lname);
 			$stmt->bindParam(":rocuseremail", $signUpData->email);
+			$stmt->bindParam(":rocuseraddress1", $signUpData->address1);
+			$stmt->bindParam(":rocuseraddress2", $signUpData->address2);
 			$stmt->bindParam(":rocusercity", $signUpData->city);
 			$stmt->bindParam(":rocuserstate", $signUpData->state);
+			$stmt->bindParam(":rocuserpincode", $signUpData->pincode);
 			$stmt->bindParam(":rocusermobile", $signUpData->mobile);
 			$stmt->bindParam(":rocuserpassword", $signUpData->password);
 
@@ -230,14 +231,17 @@ function user_register($app, $register_data) {
  */
 function user_updatedetails($userid, $updateDetails) {
 	$updateDetails = json_decode($updateDetails);
-	$sql = "UPDATE rocusers SET rocuserfirstname = :rocuserfirstname, rocuserlastname = :rocuserlastname, rocusercity = :rocusercity, rocuserstate = :rocuserstate, rocusermobile = :rocusermobile WHERE rocuserid = :rocuserid";
+	$sql = "UPDATE rocusers SET rocuserfirstname = :rocuserfirstname, rocuserlastname = :rocuserlastname, rocusercity = :rocusercity, rocuserstate = :rocuserstate, rocuseraddress1 = :rocuseraddress1, rocuseraddress2 = :rocuseraddress2, rocuserpincode = :rocuserpincode, rocusermobile = :rocusermobile WHERE rocuserid = :rocuserid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql);  
 		$stmt->bindParam(":rocuserfirstname", $updateDetails->fname);
 		$stmt->bindParam(":rocuserlastname", $updateDetails->lname);
+		$stmt->bindParam(":rocuseraddress1", $updateDetails->address1);
+		$stmt->bindParam(":rocuseraddress2", $updateDetails->address2);
 		$stmt->bindParam(":rocusercity", $updateDetails->city);
 		$stmt->bindParam(":rocuserstate", $updateDetails->state);
+		$stmt->bindParam(":rocuserpincode", $updateDetails->pincode);
 		$stmt->bindParam(":rocusermobile", $updateDetails->mobile);
 		$stmt->bindParam(":rocuserid", $userid);
 
@@ -247,6 +251,36 @@ function user_updatedetails($userid, $updateDetails) {
 	} catch(PDOException $e) {
 		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
 		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+	}
+}
+
+/*
+ * Get List of bookings by user id
+ */
+function user_bookings_list($app, $userid) {
+	$sql = "SELECT bi.rocbookinginfoid as bid, bi.roctransactionid as transid, bi.rocservicetype as serviceid, cs.roccabservices as servicetype, bi.rocservicename as servicename, bi.rocservicechargeperkm scpkm, bi.rocservicekm as servicekm, bi.rocservicestimatedrs as sers, bi.rocbookingfromlocation bfl, bi.rocbookingtolocation as btl, bi.rocserviceclass as sc, bi.rocuserid as uid, bi.rocvendorid as vid, bi.rocbookingdatetime as bdatetime, bi.rocbookingstatus bstatus FROM rocbookinginfo bi, roccabservices cs WHERE bi.rocservicetype = cs.roccabservicesid AND bi.rocuserid = :rocuserid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);
+		$stmt->bindParam(":rocuserid", $userid);
+		$stmt->execute();
+		$booking_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		$count = count($booking_data);
+		if($count) {
+			$booking_data = array("total" => $count, "results" => $booking_data);
+			echo json_encode($booking_data);
+			$app->response->setStatus(200);
+		}
+		else {
+			$booking_data = array("total" => 0, "results" => array());
+			echo json_encode($booking_data);
+			$app->response->setStatus(200);
+		}
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
 	}
 }
 ?>

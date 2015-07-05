@@ -3,7 +3,7 @@
 /*
  * Get List of users
  */
-function users_list() {
+function users_list($app) {
 	$sql = "SELECT 
 	rocuserid as uid, 
 	rocuserfirstname as fname,
@@ -40,7 +40,7 @@ function users_list() {
 /*
  * Get List of vendors
  */
-function vendors_list() {
+function vendors_list($app) {
 	$sql = "SELECT 
 	rocvendorid as vid, 
 	rocvendorname as name, 
@@ -82,6 +82,35 @@ function vendors_list() {
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
 		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+	}
+}
+
+/*
+ * Get List of bookings
+ */
+function bookings_list($app) {
+	$sql = "SELECT bi.rocbookinginfoid as bid, bi.roctransactionid as transid, bi.rocservicetype as serviceid, cs.roccabservices as servicetype, bi.rocservicename as servicename, bi.rocservicechargeperkm scpkm, bi.rocservicekm as servicekm, bi.rocservicestimatedrs as sers, bi.rocbookingfromlocation bfl, bi.rocbookingtolocation as btl, bi.rocserviceclass as sc, bi.rocuserid as uid, bi.rocvendorid as vid, bi.rocbookingdatetime as bdatetime, bi.rocbookingstatus bstatus FROM rocbookinginfo bi, roccabservices cs WHERE bi.rocservicetype = cs.roccabservicesid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);
+		$stmt->execute();		
+		$booking_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		$count = count($booking_data);
+		if($count) {
+			$booking_data = array("total" => $count, "results" => $booking_data);
+			echo json_encode($booking_data);
+			$app->response->setStatus(200);
+		}
+		else {
+			$booking_data = array("total" => 0, "results" => array());
+			echo json_encode($booking_data);
+			$app->response->setStatus(200);
+		}
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
 	}
 }
 ?>

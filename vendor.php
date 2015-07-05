@@ -31,7 +31,7 @@ function search($search) {
 /*
  * Booking cab with user details
  */
-function bookCab($bookingData) {
+function bookCab($app, $bookingData) {
 //	return $bookingData;
 	$bookingData = json_decode($bookingData);
 	$sql = "INSERT INTO rocbookinginfo (rocservicetype, rocservicename, rocservicechargeperkm, rocservicekm, rocservicestimatedrs, rocbookingfromlocation, rocbookingtolocation, rocserviceclass, rocuserid, rocbookingdatetime, rocvendorid, rocbookingstatus) VALUES (:rocservicetype, :rocservicename, :rocservicechargeperkm, :rocservicekm, :rocservicestimatedrs, :rocbookingfromlocation, :rocbookingtolocation, :rocserviceclass, :rocuserid, :rocbookingdatetime, :rocvendorid, :rocbookingstatus)";
@@ -55,12 +55,60 @@ function bookCab($bookingData) {
 		$bookingData->id = $db->lastInsertId();
 		$db = null;
 		$bookingData_id= $bookingData->id;
-		return $bookingData_id;
+
+		// generate and store transaction ID
+		if(generate_transactionid($app, $bookingData_id) == TRUE) {
+			// return total booking info data
+			booking_info_data($app, $bookingData_id);
+		}
 	} catch(PDOException $e) {
 		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
 	}
 }
+
+/*
+ * generate and store transaction ID for booked info
+ */
+function generate_transactionid($app, $bookingData_id = 0) {
+	$transaction_id = 'ROC' . date('Ymd') . $bookingData_id;
+	$sql = "UPDATE rocbookinginfo SET roctransactionid =:roctransactionid WHERE rocbookinginfoid = :rocbookinginfoid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->bindParam("roctransactionid", $transaction_id);
+		$stmt->bindParam("rocbookinginfoid", $bookingData_id);
+		$stmt->execute();
+		$db = null;
+		return TRUE;
+	} catch(PDOException $e) {
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
+	}
+}
+
+/*
+ * total booking info data by booking id
+ */
+function booking_info_data($app, $bookingData_id = 0) {
+	$sql = "SELECT bi.rocbookinginfoid as bid, bi.roctransactionid as transid, bi.rocservicetype as serviceid, cs.roccabservices as servicetype, bi.rocservicename as servicename, bi.rocservicechargeperkm scpkm, bi.rocservicekm as servicekm, bi.rocservicestimatedrs as sers, bi.rocbookingfromlocation bfl, bi.rocbookingtolocation as btl, bi.rocserviceclass as sc, bi.rocuserid as uid, bi.rocvendorid as vid, bi.rocbookingdatetime as bdatetime, bi.rocbookingstatus bstatus FROM rocbookinginfo bi, roccabservices cs WHERE bi.rocbookinginfoid = :rocbookinginfoid AND bi.rocservicetype = cs.roccabservicesid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->bindParam("rocbookinginfoid", $bookingData_id);
+		$stmt->execute();
+		$booking_data = $stmt->fetch(PDO::FETCH_OBJ);
+		$db = null;
+		echo json_encode($booking_data);
+		$app->response->setStatus(201);
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"text":"'. $e->getMessage() .'""}}'; 
+		$app->response->setStatus(500);
+	}
+}
+
 /*
  * Vendor Sign UP 
  */
@@ -385,13 +433,14 @@ function insert_vendorprices($vendorprices) {
 
 		// Checking is validation errors there
 		if(!$error) {
-			$sql = "INSERT INTO rocvendorcharges(roccabtype, roccabmodelid, rocchargeperkm, roccabservicesid, rocvendorid) VALUES(:roccabtype, :roccabmodelid, :rocchargeperkm, :roccabservicesid, :rocvendorid)";
+			$sql = "INSERT INTO rocvendorcharges(roccabtype, roccabmodelid, rocchargeperkm, rocchargeunitsperhour, roccabservicesid, rocvendorid) VALUES(:roccabtype, :roccabmodelid, :rocchargeperkm, :rocchargeunitsperhour, :roccabservicesid, :rocvendorid)";
 			try {
 				$db = getDB();
 				$stmt = $db->prepare($sql); 
 				$stmt->bindParam("roccabtype", $price->ctype);
 				$stmt->bindParam("roccabmodelid", $price->vcmid);
 				$stmt->bindParam("rocchargeperkm", $price->cpkm);
+				$stmt->bindParam("rocchargeunitsperhour", $price->cunitsph);
 				$stmt->bindParam("roccabservicesid", $price->csid);
 				$stmt->bindParam("rocvendorid", $vendor_id);
 				$stmt->execute();
@@ -506,13 +555,14 @@ function update_vendorprices($app, $request_data) {
 
 				// Checking is validation errors there
 				if(!$error) {
-					$sql = "UPDATE rocvendorcharges SET roccabtype = :roccabtype, roccabmodelid = :roccabmodelid, rocchargeperkm = :rocchargeperkm, roccabservicesid = :roccabservicesid WHERE rocvendorid = :rocvendorid AND rocvendorchargeid = :rocvendorchargeid";
+					$sql = "UPDATE rocvendorcharges SET roccabtype = :roccabtype, roccabmodelid = :roccabmodelid, rocchargeperkm = :rocchargeperkm, rocchargeunitsperhour = :rocchargeunitsperhour, roccabservicesid = :roccabservicesid WHERE rocvendorid = :rocvendorid AND rocvendorchargeid = :rocvendorchargeid";
 					try {
 						$db = getDB();
 						$stmt = $db->prepare($sql); 
 						$stmt->bindParam("roccabtype", $price->ctype);
 						$stmt->bindParam("roccabmodelid", $price->vcmid);
 						$stmt->bindParam("rocchargeperkm", $price->cpkm);
+						$stmt->bindParam("rocchargeunitsperhour", $price->cunitsph);
 						$stmt->bindParam("roccabservicesid", $price->csid);
 						$stmt->bindParam("rocvendorchargeid", $price->vcid);
 						$stmt->bindParam("rocvendorid", $vendor_id);
@@ -670,35 +720,6 @@ function cabmodels_data($app) {
 }
 
 /*
- * Getting all bookings by vendor for vendor manage bookings
- */
-function vendor_bookings($app, $vendorid) {
-	$sql = "SELECT 
-	rocbookinginfoid as bookingid, 
-	rocservicetype as servicetype, 
-	rocbookingfromlocation as fromlocation, 
-	rocbookingtolocation as tolocation, 
-	rocbookingdatetime as bookingdatetime 
-	FROM rocbookinginfo WHERE rocvendorid = :rocvendorid";
-	try {
-		$db = getDB();
-		$stmt = $db->prepare($sql);
-		$stmt->bindParam("rocvendorid", $vendorid);
-		$stmt->execute();		
-		$bookings_data = $stmt->fetchAll(PDO::FETCH_OBJ);
-		$db = null;
-		$count = count($bookings_data);
-		$bookings_data = array("total" => 0, "results" => array());
-		echo json_encode($bookings_data);
-		$app->response->setStatus(200);
-	} catch(PDOException $e) {
-	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		echo '{"error":{"message":"'. $e->getMessage() .'"}}';
-		$app->response->setStatus(500); 
-	}
-}
-
-/*
  * Getting all services by vendor for vendor manage services
  */
 function vendor_services($vendorid) {
@@ -708,6 +729,7 @@ function vendor_services($vendorid) {
 	ct.roccabtype as cabtype, 
 	vc.roccabmodelid as vcmid, 
 	vc.rocchargeperkm as cpkm, 
+	vc.rocchargeunitsperhour as cunitsph, 
 	vc.roccabservicesid as csid, 
 	cs.roccabservices as cabservice 
 	FROM rocvendorcharges vc, roccabtypes ct, roccabservices cs WHERE 
@@ -801,4 +823,34 @@ function terms_delete($app, $vendorid = 0, $termid = 0) {
 	}
 }
 
+
+/*
+ * Get List of bookings by vendor id
+ */
+function vendor_bookings_list($app, $vendorid) {
+	$sql = "SELECT bi.rocbookinginfoid as bid, bi.roctransactionid as transid, bi.rocservicetype as serviceid, cs.roccabservices as servicetype, bi.rocservicename as servicename, bi.rocservicechargeperkm scpkm, bi.rocservicekm as servicekm, bi.rocservicestimatedrs as sers, bi.rocbookingfromlocation bfl, bi.rocbookingtolocation as btl, bi.rocserviceclass as sc, bi.rocuserid as uid, bi.rocvendorid as vid, bi.rocbookingdatetime as bdatetime, bi.rocbookingstatus bstatus FROM rocbookinginfo bi, roccabservices cs WHERE bi.rocservicetype = cs.roccabservicesid AND bi.rocvendorid = :rocvendorid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);
+		$stmt->bindParam(":rocvendorid", $vendorid);
+		$stmt->execute();
+		$booking_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		$count = count($booking_data);
+		if($count) {
+			$booking_data = array("total" => $count, "results" => $booking_data);
+			echo json_encode($booking_data);
+			$app->response->setStatus(200);
+		}
+		else {
+			$booking_data = array("total" => 0, "results" => array());
+			echo json_encode($booking_data);
+			$app->response->setStatus(200);
+		}
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
+	}
+}
 ?>
