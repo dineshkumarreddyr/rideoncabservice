@@ -4,7 +4,7 @@ use Respect\Validation\Validator as v;
  * Getting user data by user ID
  */
 function user_data($rocuserid) {
-	$sql = "SELECT rocuserid as uid, rocuserfirstname as fname, rocuserlastname as lname, rocuseremail as email, rocusercity as city, rocuserstate as state, rocusermobile as mobile, rocuseraddress1 as address1, rocusersaddress2 as address2, rocuserpincode as pincode FROM rocusers WHERE  rocuserid = :rocuserid";
+	$sql = "SELECT rocuserid as uid, rocuserfirstname as fname, rocuserlastname as lname, rocuseremail as email, rocusercity as city, rocuserstate as state, rocusermobile as mobile, rocuseraddress1 as address1, rocuseraddress2 as address2, rocuserpincode as pincode FROM rocusers WHERE  rocuserid = :rocuserid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
@@ -205,7 +205,6 @@ function user_register($app, $register_data) {
 		return user_updatedetails($parsed_data->uid, $register_data);
 	}
 	else {
-		echo "not loggedin";
 		if(signUpCheck($register_data)) {
 			// if already registered user
 			$sql = "SELECT rocuserid FROM rocusers WHERE rocuseremail = :rocuseremail";
