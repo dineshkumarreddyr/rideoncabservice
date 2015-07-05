@@ -3,7 +3,7 @@
 /*
  * Get List of users
  */
-function users_list($app) {
+function users_list() {
 	$sql = "SELECT 
 	rocuserid as uid, 
 	rocuserfirstname as fname,
@@ -23,13 +23,17 @@ function users_list($app) {
 		$bookings_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
 		$count = count($bookings_data);
-		$bookings_data = array("total" => $count, "results" => $bookings_data);
-		echo json_encode($bookings_data);
-		$app->response->setStatus(200);
+		if($count) {
+			$bookings_data = array("total" => $count, "results" => $bookings_data);
+			echo json_encode($bookings_data);
+		}
+		else {
+			$bookings_data = array("total" => 0, "results" => array());
+			echo json_encode($bookings_data);
+		}
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
 		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
-		$app->response->setStatus(500);
 	}
 }
 
@@ -67,41 +71,17 @@ function vendors_list() {
 		$vendors_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
 		$count = count($vendors_data);
-		$vendors_data = array("total" => $count, "results" => $vendors_data);
-		echo json_encode($vendors_data);
-		$app->response->setStatus(200);
+		if($count) {
+			$vendors_data = array("total" => $count, "results" => $vendors_data);
+			echo json_encode($vendors_data);
+		}
+		else {
+			$vendors_data = array("total" => 0, "results" => array());
+			echo json_encode($vendors_data);
+		}
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
 		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
-		$app->response->setStatus(400);
-	}
-}
-
-/*
- * Getting all bookings
- */
-function bookings_list($app) {
-	$sql = "SELECT 
-	rocbookinginfoid as bookingid, 
-	rocservicetype as servicetype, 
-	rocbookingfromlocation as fromlocation, 
-	rocbookingtolocation as tolocation, 
-	rocbookingdatetime as bookingdatetime 
-	FROM rocbookinginfo";
-	try {
-		$db = getDB();
-		$stmt = $db->prepare($sql);
-		$stmt->execute();		
-		$bookings_data = $stmt->fetchAll(PDO::FETCH_OBJ);
-		$db = null;
-		$count = count($bookings_data);
-		$bookings_data = array("total" => $count, "results" => $bookings_data);
-		echo json_encode($bookings_data);
-		$app->response->setStatus(200);
-	} catch(PDOException $e) {
-	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
-		$app->response->setStatus(500);
 	}
 }
 ?>

@@ -307,19 +307,19 @@ $app->post(
 			}
 			else {
 				// If no validation errors
-				echo $response_data = user_register($app, $request->getBody());
-				// $response_json_data = json_decode($response_data);
-				// // checking is user successfully created or not
-				// if(isset($response_json_data->error)) {
-				// 	$app->response->setStatus(409);
-				// 	echo $response_data;
-				// }
-				// else {
-				// 	$app->response->setStatus(201);
-				// 	$json_data = json_decode($response_data);
-		  //   	$user_data = $json_data[0];	// swapping first array object
-		  //   	echo json_encode($user_data);
-				// }
+				$response_data = user_register($app, $request->getBody());
+				$response_json_data = json_decode($response_data);
+				// checking is user successfully created or not
+				if(isset($response_json_data->error)) {
+					$app->response->setStatus(409);
+					echo $response_data;
+				}
+				else {
+					$app->response->setStatus(201);
+					$json_data = json_decode($response_data);
+		    	$user_data = $json_data[0];	// swapping first array object
+		    	echo json_encode($user_data);
+				}
 			}
 		}
   }
@@ -756,10 +756,10 @@ $app->post(
 			}
 			// checking number1 is empty or not 
 			if(isset($request_data->number1)) {
-				if(!v::string()->notEmpty()->validate($request_data->number1)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->number1)) {
 					$fields['number1'] = "Number1 should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			}
 			else {
 				$fields['number1'] = "Number1 required";
@@ -818,6 +818,17 @@ $app->post(
 			}
 			else {
 				$fields['logo'] = "Logo required";
+				$error = TRUE;
+			}
+			// checking landline is empty or not 
+			if(isset($request_data->landline)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->logo)) {
+					$fields['logo'] = "Logo should not be empty";
+					$error = TRUE;
+				}*/
+			}
+			else {
+				$fields['landline'] = "Landline required";
 				$error = TRUE;
 			}
 			// Checking is validation there
@@ -1329,6 +1340,15 @@ $app->post(
 	}
 );
 
+// update vendor price
+$app->put(
+	'/vendor/prices',
+	function() use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		update_vendorprices($app, $request->getBody());		
+	}
+);
+
 // vendor terms and conditions by vendor id
 $app->get(
 	'/vendor/terms/:vendorid',
@@ -1382,6 +1402,17 @@ $app->post(
 			}
 			else {
 				$fields['vid'] = "Vendor id required";
+				$error = TRUE;
+			}
+			// checking terms cab model is empty or not 
+			if(isset($request_data->cabmodel)) {
+				if(!v::string()->notEmpty()->validate($request_data->cabmodel)) {
+					$fields['cabmodel'] = "Cab model should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['cabmodel'] = "Cab model required";
 				$error = TRUE;
 			}
 			// checking terms content is empty or not 
@@ -1443,6 +1474,17 @@ $app->put(
 				$fields['vid'] = "Vendor id required";
 				$error = TRUE;
 			}
+			// checking terms cab model is empty or not 
+			if(isset($request_data->cabmodel)) {
+				if(!v::string()->notEmpty()->validate($request_data->cabmodel)) {
+					$fields['cabmodel'] = "Cab model should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['cabmodel'] = "Cab model required";
+				$error = TRUE;
+			}
 			// checking terms content is empty or not 
 			if(isset($request_data->content)) {
 				if(!v::string()->notEmpty()->validate($request_data->content)) {
@@ -1489,6 +1531,14 @@ $app->get(
   }
 );
 
+// GET cab models list route for auto list in manage service and vendor terms
+$app->get(
+  '/cabmodels',
+  function () use ($app) {
+    cabmodels_data($app);
+  }
+);
+
 // GET cab bookings by vendor id route
 $app->get(
   '/vendor/bookings/:vendorid',
@@ -1502,6 +1552,14 @@ $app->get(
   '/vendor/services/:vendorid',
   function ($vendorid) use ($app) {
     echo $response_data = vendor_services($vendorid);
+  }
+);
+
+// DELETE manage services by vendor id route
+$app->delete(
+  '/vendor/prices/:vendorid/:vcid',
+  function ($vendorid, $vcid) use ($app) {
+    vendor_prices_delete($app, $vendorid, $vcid);
   }
 );
 
@@ -1528,6 +1586,7 @@ $app->get(
     bookings_list($app);
   }
 );
+
 
 
 $app->contentType('application/json');

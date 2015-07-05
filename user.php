@@ -1,4 +1,5 @@
 <?php
+use Respect\Validation\Validator as v;
 /*
  * Getting user data by user ID
  */
@@ -24,6 +25,12 @@ function user_data($rocuserid) {
 function user_signUp($signUpData) {
 	if(!signUpCheck($signUpData)) {
 		$signUpData = json_decode($signUpData);
+		// checking password is empty or not. if empty set default random password
+		if(isset($signUpData->password)) {
+			if(!v::string()->notEmpty()->validate($signUpData->password)) {
+				$signUpData->password = rand(00000, 99999);
+			}
+		}
 		$sql = "INSERT INTO rocusers (rocuserfirstname, rocuserlastname, rocuseremail, rocusercity, rocuserstate, rocusermobile, rocuserpassword) VALUES (:rocuserfirstname, :rocuserlastname, :rocuseremail, :rocusercity, :rocuserstate, :rocusermobile, :rocuserpassword)";
 		try {
 			$db = getDB();
@@ -195,7 +202,7 @@ function user_register($app, $register_data) {
 	$parsed_data = json_decode($register_data);
 	// checking is loggedin user data or not 
 	if(isset($parsed_data->uid)) {
-		echo "loggedin";
+		return user_updatedetails($parsed_data->uid, $register_data);
 	}
 	else {
 		echo "not loggedin";
@@ -210,13 +217,13 @@ function user_register($app, $register_data) {
 			$db = null;
 
 			$userid = $user_data->rocuserid;
-			user_updatedetails($userid, $register_data);
+			return user_updatedetails($userid, $register_data);
 		}
 		else {
-			// if not registered user
+			// if not registered user, register with data
+			return user_signUp($register_data);
 		}
 	}
-	$app->response->setStatus(200);
 }
 
 /*
@@ -224,13 +231,12 @@ function user_register($app, $register_data) {
  */
 function user_updatedetails($userid, $updateDetails) {
 	$updateDetails = json_decode($updateDetails);
-	$sql = "UPDATE rocusers SET rocuserfirstname = :rocuserfirstname, rocuserlastname = :rocuserlastname, rocuseremail = :rocuseremail, rocusercity = :rocusercity, rocuserstate = :rocuserstate, rocusermobile = :rocusermobile WHERE rocuserid = :rocuserid";
+	$sql = "UPDATE rocusers SET rocuserfirstname = :rocuserfirstname, rocuserlastname = :rocuserlastname, rocusercity = :rocusercity, rocuserstate = :rocuserstate, rocusermobile = :rocusermobile WHERE rocuserid = :rocuserid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql);  
 		$stmt->bindParam(":rocuserfirstname", $updateDetails->fname);
 		$stmt->bindParam(":rocuserlastname", $updateDetails->lname);
-		$stmt->bindParam(":rocuseremail", $updateDetails->email);
 		$stmt->bindParam(":rocusercity", $updateDetails->city);
 		$stmt->bindParam(":rocuserstate", $updateDetails->state);
 		$stmt->bindParam(":rocusermobile", $updateDetails->mobile);

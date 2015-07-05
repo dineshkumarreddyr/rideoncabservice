@@ -1,4 +1,5 @@
 <?php
+use Respect\Validation\Validator as v;
 /*
  * Ride on cab main search list
  */
@@ -66,7 +67,7 @@ function bookCab($bookingData) {
 function vendor_signUp($signUpData) {
 	if(!vendor_signUpCheck($signUpData)) {
 		$signUpData = json_decode($signUpData);
-		$sql = "INSERT INTO rocvendors (rocvendorname, rocvendoraddress, rocvendoremail, rocvendornumber1, rocvendornumber2, rocvendorusername, rocvendorpassword, rocvendorcontactperson, rocvendorlogo) VALUES (:rocvendorname, :rocvendoraddress, :rocvendoremail, :rocvendornumber1, :rocvendornumber2, :rocvendorusername, :rocvendorpassword, :rocvendorcontactperson, :rocvendorlogo)";
+		$sql = "INSERT INTO rocvendors (rocvendorname, rocvendoraddress, rocvendoremail, rocvendornumber1, rocvendornumber2, rocvendorusername, rocvendorpassword, rocvendorcontactperson, rocvendorlogo, rocvendorlandline) VALUES (:rocvendorname, :rocvendoraddress, :rocvendoremail, :rocvendornumber1, :rocvendornumber2, :rocvendorusername, :rocvendorpassword, :rocvendorcontactperson, :rocvendorlogo, :rocvendorlandline)";
 		try {
 			$db = getDB();
 			$stmt = $db->prepare($sql);  
@@ -79,6 +80,7 @@ function vendor_signUp($signUpData) {
 			$stmt->bindParam(":rocvendorpassword", $signUpData->password);
 			$stmt->bindParam(":rocvendorcontactperson", $signUpData->contactperson);
 			$stmt->bindParam(":rocvendorlogo", $signUpData->logo);
+			$stmt->bindParam(":rocvendorlandline", $signUpData->landline);
 
 			$stmt->execute();
 			$signUpData->id = $db->lastInsertId();
@@ -406,10 +408,136 @@ function insert_vendorprices($vendorprices) {
 }
 
 /*
+ * update vendor service prices
+ */
+function update_vendorprices($app, $request_data) {
+	if(!isJson($request_data)) {
+		$response = array(
+			'error' => 'Invalid JSON',
+			'error_description' => 'Invalid JSON'
+		);
+		$app->response->setStatus(400);
+		echo json_encode($response);
+	}
+	else {
+		$request_data = json_decode($request_data);
+		$fields = array(); // error fields array creation
+		$error = FALSE; // validation error checking variable
+		// checking vendor id is empty or not 
+		if(isset($request_data->vid)) {
+			if(!v::string()->notEmpty()->validate($request_data->vid)) {
+				$fields['vid'] = "Vendor id should not be empty";
+				$error = TRUE;
+			}
+		}
+		else {
+			$fields['vid'] = "Vendor id required";
+			$error = TRUE;
+		}
+		// checking prices is empty or not 
+		if(empty($request_data->prices)) {
+			$fields['prices'] = "prices required";
+			$error = TRUE;
+		}
+
+		// Checking is validation errors there
+		if($error) {
+			// If any validation errors
+			$response = array(
+				'error' => 'validation',
+				'fields' => $fields
+			);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$vendor_id = $request_data->vid;
+			$prices = $request_data->prices;
+			foreach($prices as $price) {
+				$error = FALSE;
+				
+				// checking charge id is empty or not 
+				if(isset($price->vcid)) {
+					if(empty($price->vcid)) {
+						$error = TRUE;
+					}
+				}
+				else {
+					$error = TRUE;
+				}
+
+				// checking cab type id is empty or not 
+				if(isset($price->ctype)) {
+					if(empty($price->ctype)) {
+						$error = TRUE;
+					}
+				}
+				else {
+					$error = TRUE;
+				}
+
+				// checking cab model id is empty or not 
+				if(isset($price->vcmid)) {
+					if(empty($price->vcmid)) {
+						$error = TRUE;
+					}
+				}
+				else {
+					$error = TRUE;
+				}
+				// checking charge per km is empty or not 
+				if(isset($price->cpkm)) {
+					if(empty($price->cpkm)) {
+						$error = TRUE;
+					}
+				}
+				else {
+					$error = TRUE;
+				}
+				// checking cab service id is empty or not 
+				if(isset($price->csid)) {
+					if(empty($price->csid)) {
+						$error = TRUE;
+					}
+				}
+				else {
+					$error = TRUE;
+				}
+
+				// Checking is validation errors there
+				if(!$error) {
+					$sql = "UPDATE rocvendorcharges SET roccabtype = :roccabtype, roccabmodelid = :roccabmodelid, rocchargeperkm = :rocchargeperkm, roccabservicesid = :roccabservicesid WHERE rocvendorid = :rocvendorid AND rocvendorchargeid = :rocvendorchargeid";
+					try {
+						$db = getDB();
+						$stmt = $db->prepare($sql); 
+						$stmt->bindParam("roccabtype", $price->ctype);
+						$stmt->bindParam("roccabmodelid", $price->vcmid);
+						$stmt->bindParam("rocchargeperkm", $price->cpkm);
+						$stmt->bindParam("roccabservicesid", $price->csid);
+						$stmt->bindParam("rocvendorchargeid", $price->vcid);
+						$stmt->bindParam("rocvendorid", $vendor_id);
+						$stmt->execute();
+						$db = null;
+						$status_data = array("result" => "success", "message" => "Successfully updated");
+						echo json_encode($status_data);
+						$app->response->setStatus(200);
+					} catch(PDOException $e) {
+						//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+						echo '{"error":{"text":"'. $e->getMessage() .'""}}'; 
+						$app->response->setStatus(500);
+						//break;
+					}
+				}
+			}
+		}
+	}
+}
+
+/*
  * get vendor terms and conditions by vendor id
  */
 function get_vendorterms($vendorid) {
-	$sql = "SELECT rocvendorterms as terms FROM rocvendorterms WHERE rocvendorid = :rocvendorid";
+	$sql = "SELECT rocvendortermsid as vtid, roccabmodelid as cabmodel, rocvendorterms as terms FROM rocvendorterms WHERE rocvendorid = :rocvendorid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
@@ -431,12 +559,14 @@ function get_vendorterms($vendorid) {
 function insert_vendorterms($vendorterms) {
 	$vendorterms = json_decode($vendorterms);
 	$vendor_id = $vendorterms->vid;
+	$cabmodel = $vendorterms->cabmodel;
 	$content = $vendorterms->content;
-	$sql = "INSERT INTO rocvendorterms(rocvendorid, rocvendorterms) VALUES(:rocvendorid, :rocvendorterms)";
+	$sql = "INSERT INTO rocvendorterms(rocvendorid, roccabmodelid, rocvendorterms) VALUES(:rocvendorid, :roccabmodelid, :rocvendorterms)";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
 		$stmt->bindParam("rocvendorid", $vendor_id);
+		$stmt->bindParam("roccabmodelid", $cabmodel);
 		$stmt->bindParam("rocvendorterms", $content);
 		$stmt->execute();
 		$db = null;
@@ -455,12 +585,14 @@ function insert_vendorterms($vendorterms) {
 function update_vendorterms($vendorterms) {
 	$vendorterms = json_decode($vendorterms);
 	$vendor_id = $vendorterms->vid;
+	$content = $vendorterms->cabmodel;
 	$content = $vendorterms->content;
-	$sql = "UPDATE rocvendorterms SET rocvendorterms = :rocvendorterms WHERE rocvendorid = :rocvendorid";
+	$sql = "UPDATE rocvendorterms SET roccabmodelid =:roccabmodelid, rocvendorterms = :rocvendorterms WHERE rocvendorid = :rocvendorid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
 		$stmt->bindParam("rocvendorid", $vendor_id);
+		$stmt->bindParam("roccabmodelid", $cabmodel);
 		$stmt->bindParam("rocvendorterms", $content);
 		$stmt->execute();
 		$db = null;
@@ -505,6 +637,28 @@ function cabtypes_data($app) {
 		$services_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
 		echo json_encode($services_data);
+		$app->response->setStatus(200);
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
+	}
+}
+
+/*
+ * Getting cab models data
+ */
+function cabmodels_data($app) {
+	echo $roccabmodelid;
+	$sql = "SELECT DISTINCT(roccabmodelid) as cabmodel FROM rocvendorcharges";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);
+		$stmt->execute();		
+		$models_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		$models_data = array('total' => count($models_data), 'result' => $models_data);
+		echo json_encode($models_data);
 		$app->response->setStatus(200);
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
@@ -581,6 +735,28 @@ function vendor_services($vendorid) {
 }
 
 /*
+ * Delete vendor services by vendorid and chargeid
+ */
+function vendor_prices_delete($app, $rocvendorid = 0, $vcid = 0) {
+	$sql = "DELETE FROM rocvendorcharges WHERE  rocvendorid = :rocvendorid AND rocvendorchargeid = :rocvendorchargeid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->bindParam("rocvendorid", $rocvendorid);
+		$stmt->bindParam("rocvendorchargeid", $vcid);
+		$stmt->execute();		
+		$db = null;
+		$status_data = array("result" => "success", "message" => "Vendor service successfully Deleted");
+		echo json_encode($status_data);
+		$app->response->setStatus(200);
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}';
+		$app->response->setStatus(500);
+	}
+}
+
+/*
  * Delete vendor by vendorid
  */
 function vendor_delete($app, $rocvendorid = 0) {
@@ -596,7 +772,7 @@ function vendor_delete($app, $rocvendorid = 0) {
 		$app->response->setStatus(200);
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
-		return '{"error":{"message":"'. $e->getMessage() .'"}}';
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}';
 		$app->response->setStatus(500);
 	}
 }
