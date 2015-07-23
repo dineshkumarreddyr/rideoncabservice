@@ -414,3 +414,31 @@ URL : {base_url}/vendor/services/{vendor_id}
 Method : GET
 
 Response :
+------------------------------------------------------------------------------------------------------------
+Title : user forgot password
+URL : {base_url}/user/forgotpassword
+Method : POST
+Request :
+{
+    "email" :"udayakumarswamy@gmail.com"
+}
+Response :
+400
+{"error":"Invalid","error_description":"Invalid user"}
+
+200
+{"result":"success","message":"Password successfully sent to your mail, please check.."}
+------------------------------------------------------------------------------------------------------------
+Title : Vendor forgot password
+URL : {base_url}/vendor/forgotpassword
+Method : GET
+Request :
+{
+    "email" :"udayakumarswamy@gmail.com"
+}
+Response :
+400
+{"error":"Invalid","error_description":"Invalid user"}
+
+200
+{"result":"success","message":"Password successfully sent to your mail, please check.."}
