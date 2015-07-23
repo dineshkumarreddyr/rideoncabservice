@@ -1709,6 +1709,14 @@ $app->get(
   }
 );
 
+// GET admin bookings list route
+$app->get(
+  '/vendor/terms',
+  function () use ($app) {
+    vendor_terms($app);
+  }
+);
+
 
 
 $app->contentType('application/json');

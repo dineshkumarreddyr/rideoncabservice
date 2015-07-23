@@ -431,7 +431,7 @@ Response :
 ------------------------------------------------------------------------------------------------------------
 Title : Vendor forgot password
 URL : {base_url}/vendor/forgotpassword
-Method : GET
+Method : POST
 Request :
 {
     "email" :"udayakumarswamy@gmail.com"
@@ -442,3 +442,11 @@ Response :
 
 200
 {"result":"success","message":"Password successfully sent to your mail, please check.."}
+------------------------------------------------------------------------------------------------------------
+Title : all Vendor terms
+URL : {base_url}/vendor/terms
+Method : GET
+Response :
+
+200
+[{"vtid":"10","vid":"12","cabmodel":"","terms":"Waiting Charges"},{"vtid":"11","vid":"12","cabmodel":"","terms":"Waiting Charges"},{"vtid":"12","vid":"12","cabmodel":"","terms":"Person seating"},{"vtid":"14","vid":"11","cabmodel":"Nano","terms":"Terms Nano"},{"vtid":"16","vid":"12","cabmodel":"Indica","terms":"Terms Indica 3"},{"vtid":"17","vid":"17","cabmodel":"Innova","terms":"After 8hrs every hour costs 200 rs extra"}]

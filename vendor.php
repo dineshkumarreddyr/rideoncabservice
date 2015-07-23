@@ -905,4 +905,22 @@ function vendor_bookings_list($app, $vendorid) {
 		$app->response->setStatus(500);
 	}
 }
+
+function vendor_terms($app) {
+	$sql = "SELECT rocvendortermsid as vtid, rocvendorid as vid, roccabmodelid as cabmodel, rocvendorterms as terms FROM rocvendorterms";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->execute();
+		$terms_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		echo json_encode($terms_data);
+		$app->response->setStatus(200);
+	} catch(PDOException $e) {
+		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"text":"'. $e->getMessage() .'""}}'; 
+		//break;
+		$app->response->setStatus(500);
+	}
+}
 ?>
