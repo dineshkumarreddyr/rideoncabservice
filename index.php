@@ -3,6 +3,13 @@ include 'db.php';
 include 'user.php';
 include 'vendor.php';
 include 'admin.php';
+
+// SMTP mail integration
+include 'mail.php';
+
+// SMS integration
+include 'sms.php';
+
 /**
  * Step 1: Require the Slim Framework
  *
@@ -390,6 +397,54 @@ $app->post(
     			$user_data = $response_json_data[0];	// swapping first array object
     			echo json_encode($user_data);
     		}
+			}
+		}
+	}
+);
+
+// User forgot password route
+$app->post(
+	'/user/forgotpassword',
+	function () use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+			);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$request_data = json_decode($request_data);
+			$fields = array(); // error fields array creation
+			$error = FALSE; // validation error checking variable
+			// checking email is empty or not 
+			if(isset($request_data->email)) {
+				if(!v::string()->notEmpty()->validate($request_data->email)) {
+					$fields['email'] = "Email should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['email'] = "Email required";
+				$error = TRUE;
+			}
+
+			// Checking is validation errors there
+			if($error) {
+				// If any validation errors
+				$response = array(
+					'error' => 'validation',
+					'fields' => $fields
+				);
+				$app->response->setStatus(400);
+				echo json_encode($response);
+			}
+			else {
+				// If no validation errors
+				user_forgotpassword($app, $request->getBody());
 			}
 		}
 	}
@@ -1146,6 +1201,54 @@ $app->put(
 			}
     }
   }
+);
+
+// Vendor forgot password route
+$app->post(
+	'/vendor/forgotpassword',
+	function () use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+			);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$request_data = json_decode($request_data);
+			$fields = array(); // error fields array creation
+			$error = FALSE; // validation error checking variable
+			// checking email is empty or not 
+			if(isset($request_data->email)) {
+				if(!v::string()->notEmpty()->validate($request_data->email)) {
+					$fields['email'] = "Email should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['email'] = "Email required";
+				$error = TRUE;
+			}
+
+			// Checking is validation errors there
+			if($error) {
+				// If any validation errors
+				$response = array(
+					'error' => 'validation',
+					'fields' => $fields
+				);
+				$app->response->setStatus(400);
+				echo json_encode($response);
+			}
+			else {
+				// If no validation errors
+				vendor_forgotpassword($app, $request->getBody());
+			}
+		}
+	}
 );
 
 // Vendor Change password route

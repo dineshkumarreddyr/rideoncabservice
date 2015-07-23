@@ -58,6 +58,22 @@ function bookCab($app, $bookingData) {
 
 		// generate and store transaction ID
 		if(generate_transactionid($app, $bookingData_id) == TRUE) {
+
+			$user_data = json_decode(user_data($bookingData->userid));
+			$user_data = $user_data[0];
+
+			$transaction_id = 'ROC' . date('Ymd') . $bookingData_id;
+			$mobile = $user_data->mobile;
+			$message = "CAB successfully booked, Booking ID:" . $transaction_id;
+			// sending message to user with booking id
+			prepare_sms($mobile, $message);
+
+			// sending booking confirmation mail to user
+			$msg  = 'Hi ' . $user_data->fname . ', <br> ' . $message;
+			$subj = 'Ride on cab : Booking confirmation';
+			$to   = $user_data->email;
+			mailer($to, $subj, $msg);
+
 			// return total booking info data
 			booking_info_data($app, $bookingData_id);
 		}
@@ -259,6 +275,42 @@ function vendor_updatedetails($vendorid, $updateDetails) {
 	// 	$status_data = array("error" => "duplicate", "erro_description" => "This email already exists");
 	// 	return json_encode($status_data);
 	// }
+}
+
+/*
+ * Vendor forgot password by user email and return status
+ */
+function vendor_forgotpassword($app, $rocvendor) {
+	$rocvendor = json_decode($rocvendor);
+	$sql = "SELECT rocvendorpassword FROM rocvendors WHERE rocvendoremail = :rocvendoremail";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);
+		$stmt->bindParam(":rocvendoremail", $rocvendor->email);
+		$stmt->execute();
+		$vendor_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		if(count($vendor_data)) {
+			$msg  = 'Hi, <br> your password = ' . $vendor_data[0]->rocvendorpassword;
+			$subj = 'Ride on cab : Forgot password';
+			$to   = $rocuser->email;
+
+			if(mailer($to, $subj, $msg)) {
+				$app->response->setStatus(200);
+				$status_data = array("result" => "success", "message" => "Password successfully sent to your mail, please check..");
+				echo json_encode($status_data);
+			}
+		}
+		else {
+			$app->response->setStatus(400);
+			$status_data = array("error" => "Invalid", "error_description" => "Invalid user");
+			echo json_encode($status_data);
+		}
+	} catch(PDOException $e) {
+		$app->response->setStatus(500);
+		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"text":"'. $e->getMessage() .'"}}'; 
+	}
 }
 
 /*

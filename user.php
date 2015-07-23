@@ -131,6 +131,42 @@ function user_login($loginData) {
 }
 
 /*
+ * User forgot password by user email and return status
+ */
+function user_forgotpassword($app, $rocuser) {
+	$rocuser = json_decode($rocuser);
+	$sql = "SELECT rocuserpassword FROM rocusers WHERE rocuseremail = :rocuseremail";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);
+		$stmt->bindParam(":rocuseremail", $rocuser->email);
+		$stmt->execute();
+		$user_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		if(count($user_data)) {
+			$msg  = 'Hi, <br> your password = ' . $user_data[0]->rocuserpassword;
+			$subj = 'Ride on cab : Forgot password';
+			$to   = $rocuser->email;
+
+			if(mailer($to, $subj, $msg)) {
+				$app->response->setStatus(200);
+				$status_data = array("result" => "success", "message" => "Password successfully sent to your mail, please check..");
+				echo json_encode($status_data);
+			}
+		}
+		else {
+			$app->response->setStatus(400);
+			$status_data = array("error" => "Invalid", "error_description" => "Invalid user");
+			echo json_encode($status_data);
+		}
+	} catch(PDOException $e) {
+		$app->response->setStatus(500);
+		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"text":"'. $e->getMessage() .'"}}'; 
+	}
+}
+
+/*
  * User change password by user id and return status
  */
 function user_changepassword($passwordData, $rocuserid) {
