@@ -29,7 +29,8 @@ function user_signUp($signUpData) {
 		if(!isset($signUpData->password)) {
 			$signUpData->password = rand(00000, 99999);
 		}
-		$sql = "INSERT INTO rocusers (rocuserfirstname, rocuserlastname, rocuseremail, rocuseraddress1, rocuseraddress2, rocusercity, rocuserstate, rocuserpincode, rocusermobile, rocuserpassword) VALUES (:rocuserfirstname, :rocuserlastname, :rocuseremail, :rocuseraddress1, :rocuseraddress2, :rocusercity, :rocuserstate, :rocuserpincode, :rocusermobile, :rocuserpassword)";
+		$hash = sha1(rand(00000, 99999));
+		$sql = "INSERT INTO rocusers (rocuserfirstname, rocuserlastname, rocuseremail, rocuseraddress1, rocuseraddress2, rocusercity, rocuserstate, rocuserpincode, rocusermobile, rocuserpassword, rocuserhash) VALUES (:rocuserfirstname, :rocuserlastname, :rocuseremail, :rocuseraddress1, :rocuseraddress2, :rocusercity, :rocuserstate, :rocuserpincode, :rocusermobile, :rocuserpassword, :rocuserhash)";
 		try {
 			$db = getDB();
 			$stmt = $db->prepare($sql);  
@@ -43,11 +44,25 @@ function user_signUp($signUpData) {
 			$stmt->bindParam(":rocuserpincode", $signUpData->pincode);
 			$stmt->bindParam(":rocusermobile", $signUpData->mobile);
 			$stmt->bindParam(":rocuserpassword", $signUpData->password);
+			$stmt->bindParam(":rocuserhash", $hash);
 
 			$stmt->execute();
 			$signUpData->id = $db->lastInsertId();
 			$db = null;
 			$signUpData_id= $signUpData->id;
+			$confirmation_link = $baseUrl . 'user/signup/confirmation?e=' . urlencode($signUpData->email) . '&h=' . $hash ;
+
+			// sending user registrattioin confirmation mail to user
+			$msg  = '
+			<div class="wrapmain" style="padding:30px;text-align:center">
+             <h2 style="font-size:30px;text-align:center;color:#e38e00;font-weight:700;margin-top:0;">Thankyou!</h2>
+             <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Your email has been successfully registered. Please click the below link to verify your email address.</p>
+             <a href="' . $confirmation_link . '" style="color:#;text-decoration:none;">Activate your account.</a>
+            </div>';
+			$subj = 'Ride on cab : Account Registratioin Confirmation';
+			$to   = $signUpData->email;
+			mailer($to, $subj, $msg);
+
 			//getUserUpdate($signUpData_id);
 			return user_data($signUpData_id);
 		} catch(PDOException $e) {
