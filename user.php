@@ -50,6 +50,11 @@ function user_signUp($signUpData) {
 			$signUpData->id = $db->lastInsertId();
 			$db = null;
 			$signUpData_id= $signUpData->id;
+
+			// Get request object
+			$req = $app->request;
+			//Get base URI
+			$baseUrl = $req->getUrl()."/";
 			$confirmation_link = $baseUrl . 'user/signup/confirmation?e=' . urlencode($signUpData->email) . '&h=' . $hash ;
 
 			// sending user registrattioin confirmation mail to user
