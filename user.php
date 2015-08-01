@@ -23,7 +23,21 @@ function user_data($rocuserid) {
 /**
  * User account registration email confirmation
  */
+function user_signup_activate($app, $rocuserid) {
+	$sql = "UPDATE rocusers SET rocuserstatus = '1' WHERE rocuserid = :rocuserid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);  
+		$stmt->bindParam(":rocuserid", $rocuserid);
+		$stmt->execute();
+		$db = null;
 
+	} catch(PDOException $e) {
+		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
+	}
+}
 function user_signup_confirmation($app, $email, $hash) {
 	$sql = "SELECT rocuserid as uid, rocuseremail as email, rocuserhash as hash FROM rocusers WHERE  rocuseremail = :rocuseremail";
 	try {
@@ -35,15 +49,9 @@ function user_signup_confirmation($app, $email, $hash) {
 		$db = null;
 
 		if($user_data->hash == $hash) {
-			$sql = "UPDATE rocusers SET rocuserstatus = :rocuserstatus WHERE rocuserid = :rocuserid";
-			$db = getDB();
-			$stmt = $db->prepare($sql);  
-			$stmt->bindParam(":rocuserstatus", '1');
-			$stmt->bindParam(":rocuserid", $user_data->uid);
 
-			$stmt->execute();
-			$db = null;
-
+			user_signup_activate($app, $user_data->uid);
+			
 			$app->response->setStatus(200);
 			echo '
 			<html>
@@ -79,7 +87,7 @@ function user_signup_confirmation($app, $email, $hash) {
 		      </body>
 		    </html>
 		';
-		$app->response->headers->set('Content-Type', 'text/html');
+		// $app->response->headers->set('Content-Type', 'text/html');
 		}
 		else {
 			$app->response->setStatus(404);
