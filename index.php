@@ -450,6 +450,140 @@ $app->post(
 	}
 );
 
+// User update details route
+$app->put(
+    '/user/updatedetails/:userid',
+    function ($userid) use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+			);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$request_data = json_decode($request_data);
+			$fields = array(); // error fields array creation
+			$error = FALSE; // validation error checking variable
+			// checking fname is empty or not 
+			if(isset($request_data->fname)) {
+				if(!v::string()->notEmpty()->validate($request_data->fname)) {
+					$fields['fname'] = "First Name should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['fname'] = "First Name required";
+				$error = TRUE;
+			}
+			// checking last name is empty or not 
+			if(isset($request_data->lname)) {
+				if(!v::string()->notEmpty()->validate($request_data->lname)) {
+					$fields['lname'] = "Last Name should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['lname'] = "Last Name  required";
+				$error = TRUE;
+			}
+			// checking address1 is empty or not 
+			if(isset($request_data->address1)) {
+				if(!v::string()->notEmpty()->validate($request_data->address1)) {
+					$fields['address1'] = "Address1 should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['address1'] = "Address1 required";
+				$error = TRUE;
+			}
+			// checking address2 is empty or not 
+			if(isset($request_data->address2)) {
+				if(!v::string()->notEmpty()->validate($request_data->address2)) {
+					$fields['address2'] = "Address2 should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['address2'] = "Address2 required";
+				$error = TRUE;
+			}
+			// checking city is empty or not 
+			if(isset($request_data->city)) {
+				if(!v::string()->notEmpty()->validate($request_data->city)) {
+					$fields['city'] = "City should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['city'] = "City required";
+				$error = TRUE;
+			}
+			// checking state is empty or not 
+			if(isset($request_data->state)) {
+				if(!v::string()->notEmpty()->validate($request_data->state)) {
+					$fields['state'] = "State should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['state'] = "State required";
+				$error = TRUE;
+			}
+			// checking pincode is empty or not 
+			if(isset($request_data->pincode)) {
+				if(!v::string()->notEmpty()->validate($request_data->pincode)) {
+					$fields['pincode'] = "Pincode should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['pincode'] = "Pincode required";
+				$error = TRUE;
+			}
+			// checking mobile  is empty or not 
+			if(isset($request_data->mobile)) {
+				if(!v::string()->notEmpty()->validate($request_data->mobile)) {
+					$fields['mobile'] = "Mobile should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['mobile'] = "Mobile required";
+				$error = TRUE;
+			}
+			
+			// Checking is validation there
+			if($error) {
+				$response = array(
+					'error' => 'validation',
+					'fields' => $fields
+				);
+				$app->response->setStatus(400);
+				echo json_encode($response);
+			}
+			else {
+				// If no validation errors
+				$response_data = user_updatedetails($userid, $request->getBody());
+				$response_json_data = json_decode($response_data);
+				// checking is vendor successfully updated or not
+				if(isset($response_json_data->error)) {
+					$app->response->setStatus(409);
+					echo $response_data;
+				}
+				else {
+					$app->response->setStatus(200);
+		    	echo $response_data;
+				}
+			}
+    }
+  }
+);
+
 // User Login route
 $app->put(
 	'/user/changepassword/:rocuserid',

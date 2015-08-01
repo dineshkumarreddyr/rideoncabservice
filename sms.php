@@ -5,7 +5,7 @@ function prepare_sms($userMobiles, $message) {
 	$smsApi = 'A778850aa698b0602f8a2e6b1ff660db6'; 
 	$smsFormat = 'php';
 	$method = 'sms';
-	$sender = 'RIDEONC';
+	$sender = 'RIDEOC';
 	// $message = 'MESSAGE Dev';
 	// $userMobiles = '7569508595';
 

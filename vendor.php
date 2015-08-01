@@ -64,12 +64,16 @@ function bookCab($app, $bookingData) {
 
 			$transaction_id = 'ROC' . date('Ymd') . $bookingData_id;
 			$mobile = $user_data->mobile;
-			$message = "CAB successfully booked, Booking ID:" . $transaction_id;
+			$message = "CAB successfully booked, Booking ID: " . $transaction_id;
 			// sending message to user with booking id
 			prepare_sms($mobile, $message);
 
 			// sending booking confirmation mail to user
-			$msg  = 'Hi ' . $user_data->fname . ', <br> ' . $message;
+			$msg  = '
+			<div class="wrapmain" style="padding:30px;text-align:center">
+		     <h2 style="font-size:30px;text-align:center;color:#e38e00;font-weight:700;margin-top:0;">Hi ' . $user_data->fname . '..!</h2>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">' . $message . '</p>
+		    </div>';
 			$subj = 'Ride on cab : Booking confirmation';
 			$to   = $user_data->email;
 			mailer($to, $subj, $msg);
@@ -89,7 +93,7 @@ function bookCab($app, $bookingData) {
  */
 function generate_transactionid($app, $bookingData_id = 0) {
 	$transaction_id = 'ROC' . date('Ymd') . $bookingData_id;
-	$sql = "UPDATE rocbookinginfo SET roctransactionid =:roctransactionid WHERE rocbookinginfoid = :rocbookinginfoid";
+	$sql = "UPDATE rocbookinginfo SET roctransactionid = :roctransactionid WHERE rocbookinginfoid = :rocbookinginfoid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
@@ -101,6 +105,7 @@ function generate_transactionid($app, $bookingData_id = 0) {
 	} catch(PDOException $e) {
 		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
 		$app->response->setStatus(500);
+		return FALSE;
 	}
 }
 
@@ -282,7 +287,7 @@ function vendor_updatedetails($vendorid, $updateDetails) {
  */
 function vendor_forgotpassword($app, $rocvendor) {
 	$rocvendor = json_decode($rocvendor);
-	$sql = "SELECT rocvendorpassword FROM rocvendors WHERE rocvendoremail = :rocvendoremail";
+	$sql = "SELECT rocvendorname, rocvendorpassword FROM rocvendors WHERE rocvendoremail = :rocvendoremail";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql);
@@ -291,7 +296,11 @@ function vendor_forgotpassword($app, $rocvendor) {
 		$vendor_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
 		if(count($vendor_data)) {
-			$msg  = 'Hi, <br> your password = ' . $vendor_data[0]->rocvendorpassword;
+			$msg  = '
+			<div class="wrapmain" style="padding:30px;text-align:center">
+		     <h2 style="font-size:30px;text-align:center;color:#e38e00;font-weight:700;margin-top:0;">Hi ' . $vendor_data[0]->rocvendorname . '..!</h2>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Your password - ' . $vendor_data[0]->rocuserpassword . '</p>
+		    </div>';
 			$subj = 'Ride on cab : Forgot password';
 			$to   = $rocuser->email;
 
@@ -753,7 +762,7 @@ function cabtypes_data($app) {
  * Getting cab models data
  */
 function cabmodels_data($app) {
-	echo $roccabmodelid;
+	// echo $roccabmodelid;
 	$sql = "SELECT DISTINCT(roccabmodelid) as cabmodel FROM rocvendorcharges";
 	try {
 		$db = getDB();

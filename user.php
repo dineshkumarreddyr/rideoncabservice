@@ -135,7 +135,7 @@ function user_login($loginData) {
  */
 function user_forgotpassword($app, $rocuser) {
 	$rocuser = json_decode($rocuser);
-	$sql = "SELECT rocuserpassword FROM rocusers WHERE rocuseremail = :rocuseremail";
+	$sql = "SELECT rocuserfirstname as fname,rocuserpassword FROM rocusers WHERE rocuseremail = :rocuseremail";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql);
@@ -144,7 +144,11 @@ function user_forgotpassword($app, $rocuser) {
 		$user_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
 		if(count($user_data)) {
-			$msg  = 'Hi, <br> your password = ' . $user_data[0]->rocuserpassword;
+			$msg  = '
+			<div class="wrapmain" style="padding:30px;text-align:center">
+		     <h2 style="font-size:30px;text-align:center;color:#e38e00;font-weight:700;margin-top:0;">Hi ' . $user_data[0]->fname . '..!</h2>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Your password - ' . $user_data[0]->rocuserpassword . '</p>
+		    </div>';
 			$subj = 'Ride on cab : Forgot password';
 			$to   = $rocuser->email;
 
