@@ -36,15 +36,13 @@ function user_signup_confirmation($app, $email, $hash) {
 
 		if($user_data->hash == $hash) {
 			$sql = "UPDATE rocusers SET rocuserstatus = :rocuserstatus WHERE rocuserid = :rocuserid";
-			try {
-				$db = getDB();
-				$stmt = $db->prepare($sql);  
-				$stmt->bindParam(":rocuserstatus", '1');
-				$stmt->bindParam(":rocuserid", $user_data->uid);
+			$db = getDB();
+			$stmt = $db->prepare($sql);  
+			$stmt->bindParam(":rocuserstatus", '1');
+			$stmt->bindParam(":rocuserid", $user_data->uid);
 
-				$stmt->execute();
-				$db = null;
-			}
+			$stmt->execute();
+			$db = null;
 
 			$app->response->setStatus(200);
 			echo '
