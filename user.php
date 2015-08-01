@@ -35,6 +35,17 @@ function user_signup_confirmation($app, $email, $hash) {
 		$db = null;
 
 		if($user_data->hash == $hash) {
+			$sql = "UPDATE rocusers SET rocuserstaus = :rocuserstaus WHERE rocuserid = :rocuserid";
+			try {
+				$db = getDB();
+				$stmt = $db->prepare($sql);  
+				$stmt->bindParam(":rocuserstaus", '1');
+				$stmt->bindParam(":rocuserid", $user_data->uid);
+
+				$stmt->execute();
+				$db = null;
+			}
+
 			$app->response->setStatus(200);
 			echo '
 			<html>
@@ -74,6 +85,7 @@ function user_signup_confirmation($app, $email, $hash) {
 		}
 		else {
 			$app->response->setStatus(404);
+			echo '';
 		}
 		
 	} catch(PDOException $e) {

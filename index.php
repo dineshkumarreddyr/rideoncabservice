@@ -37,7 +37,7 @@ $app = new \Slim\Slim();
 $req = $app->request;
 session_start();
 //Get base URI
-$_SESSION['baseUrl'] = $req->getUrl()."/";
+$_SESSION['baseUrl'] = $req->getUrl()."/rideoncabservice/";
 
 
 $app->response->headers->set('Access-Control-Allow-Origin', '*');
