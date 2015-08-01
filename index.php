@@ -1867,7 +1867,7 @@ $app->get(
 
 
 
-$app->contentType('application/json');
+// $app->contentType('application/json');
 /**
  * Step 4: Run the Slim application
  *

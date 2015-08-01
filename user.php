@@ -70,6 +70,7 @@ function user_signup_confirmation($app, $email, $hash) {
 		      </body>
 		    </html>
 		';
+		$app->response->headers->set('Content-Type', 'text/html');
 		}
 		else {
 			$app->response->setStatus(404);
