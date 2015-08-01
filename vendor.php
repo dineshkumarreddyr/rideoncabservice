@@ -62,6 +62,9 @@ function bookCab($app, $bookingData) {
 			$user_data = json_decode(user_data($bookingData->userid));
 			$user_data = $user_data[0];
 
+			$vendor_data = json_decode(vendor_data($bookingData->vendorid, $mode = 'mini'));
+			$vendor_data = $vendor_data[0];
+
 			$transaction_id = 'ROC' . date('Ymd') . $bookingData_id;
 			$mobile = $user_data->mobile;
 			$message = "CAB successfully booked, Booking ID: " . $transaction_id;
@@ -76,6 +79,16 @@ function bookCab($app, $bookingData) {
 		    </div>';
 			$subj = 'Ride on cab : Booking confirmation';
 			$to   = $user_data->email;
+			mailer($to, $subj, $msg);
+
+			$msg  = '
+			<div class="wrapmain" style="padding:30px;text-align:center">
+		     <h2 style="font-size:30px;text-align:center;color:#e38e00;font-weight:700;margin-top:0;">Hi ' . $vendor_data->name . '..!</h2>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">' . $message . '</p>
+		    </div>';
+			$subj = 'Ride on cab : New Booking';
+			$to   = $vendor_data->email . ',' . 'bookings@rideoncab.com';
+
 			mailer($to, $subj, $msg);
 
 			// return total booking info data
@@ -234,7 +247,7 @@ function vendor_data($rocvendorid, $mode = 'mini') {
 		$stmt->execute();		
 		$vendor_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
-		return json_encode($vendor_data[0]);
+		return json_encode($vendor_data);
 		
 	} catch(PDOException $e) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');

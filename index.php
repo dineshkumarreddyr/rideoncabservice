@@ -278,13 +278,13 @@ $app->post(
 			}
 			// checking Address2 is empty or not
 			if(isset($request_data->address2)) {
-				if(!v::string()->notEmpty()->validate($request_data->address2)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->address2)) {
 					$fields['address2'] = "Address2 should not be empty";
 					$error = TRUE;
-				}
+				}*/
 			} else {
-				$fields['address2'] = "Address2 required";
-				$error = TRUE;
+				/*$fields['address2'] = "Address2 required";
+				$error = TRUE;*/
 			}
 			// checking city is empty or not
 			if(isset($request_data->city)) {

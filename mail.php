@@ -54,7 +54,10 @@ function mailer($to, $subject, $message) {
     $mail->SetFrom("mail_roc@rideoncab.com");
     $mail->Subject = $subject;
     $mail->Body = $message;
-    $mail->AddAddress($to);
+    $to_mails = explode(',', $to);
+    foreach ($to_mails as $to) {
+      $mail->AddAddress($to);
+    }
     if($mail->Send()) {
         return TRUE;
     } else {
