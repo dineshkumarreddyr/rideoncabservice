@@ -80,6 +80,14 @@ $app->delete(
 	}
 );
 
+// GET user signup email confirmation with hash code
+$app->get(
+  '/user/signup/confirmation/:email/:hash',
+  function ($email, $hash) use ($app) {
+    $response_data = user_signup_confirmation($app, $email, $hash);
+  }
+);
+
 
 // User signUp route
 $app->post(

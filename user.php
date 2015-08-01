@@ -19,6 +19,70 @@ function user_data($rocuserid) {
 		return '{"error":{"message":"'. $e->getMessage() .'"}}'; 
 	}
 }
+
+/**
+ * User account registration email confirmation
+ */
+
+function user_signup_confirmation($app, $email, $hash) {
+	$sql = "SELECT rocuserid as uid, rocuseremail as email, rocuserhash as hash FROM rocusers WHERE  rocuseremail = :rocuseremail";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->bindParam("rocuseremail", urldecode($email));
+		$stmt->execute();		
+		$user_data = $stmt->fetch(PDO::FETCH_OBJ);
+		$db = null;
+
+		if($user_data->hash == $hash) {
+			$app->response->setStatus(200);
+			echo '
+			<html>
+		      <body style="margin:0;padding:0;font-family: Roboto, sans-serif;">
+		       <div class="wrapper" style="width:650px;margin:0 auto;background:#f5f5f5;">
+		         <div class="header" style="padding:15px;background:#000;text-align:center;border-top:5px solid #e38e00">
+		           <img src="http://www.rideoncab.com/app/assets/images/logo.png">
+		         </div>
+
+	          		<div class="wrapmain" style="padding:30px;text-align:center">
+		             <h2 style="font-size:30px;text-align:center;color:#e38e00;font-weight:700;margin-top:0;">Thankyou!</h2>
+		             <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Your email has been successfully activated. Please click the below link to login.</p>
+		             <a href="http://www.rideoncab.com/" style="color:#;text-decoration:none;">CLICK HERE TO LOGIN.</a>
+	            	</div>
+
+
+		        <div class="footer-wrap" style="background: #242424;padding-top:15px;padding-bottom:15px;text-align: center">
+		            <div>Search • Compare • Book</div>
+		            <div class="footer-wrap-links" style="margin-top:10px;">
+		                <a href="http://www.rideoncab.com/home/termsandconditions" style="font-size: 12px;color: #ebebeb;text-transform: uppercase;padding: 10px;text-decoration:none;">Terms &amp; Conditions</a>
+		                <a href="http://www.rideoncab.com/home/aboutus" style="font-size: 12px;color: #ebebeb;text-transform: uppercase;padding: 10px;text-decoration:none;">about us</a>
+		                <a href="http://www.rideoncab.com/home/carrers" style="font-size: 12px;color: #ebebeb;text-transform: uppercase;padding: 10px;text-decoration:none;">careers</a>
+		                <a href="http://www.rideoncab.com/vendor/signin" style="font-size: 12px;color: #ebebeb;text-transform: uppercase;padding: 10px;text-decoration:none;">be a vendor</a>
+		                <a href="http://www.rideoncab.com/home/contactus" style="font-size: 12px;color: #ebebeb;text-transform: uppercase;padding: 10px;text-decoration:none;">reach us</a>
+		            </div>
+		            <div class="footer-wrap-links" style="margin-top:10px;">
+		                <a href="https://www.facebook.com/rideoncab" target="_blank" style="font-size: 12px;color: #ebebeb;text-transform: uppercase;padding: 10px;text-decoration:none;"><img src="http://www.rideoncab.com/app/assets/images/fb.png"></a>
+		                <a href="https://twitter.com/rideoncab" target="_blank" style="font-size: 12px;color: #ebebeb;text-transform: uppercase;padding: 10px;text-decoration:none;"><img src="http://www.rideoncab.com/app/assets/images/twitter.png"></a>
+		                <a href="#" style="font-size: 12px;color: #ebebeb;text-transform: uppercase;padding: 10px;text-decoration:none;"><img src="http://www.rideoncab.com/app/assets/images/gplus.png"></a>
+		            </div>
+		        </div>
+		       </div>   
+		      </body>
+		    </html>
+		';
+		}
+		else {
+			$app->response->setStatus(404);
+		}
+		
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
+	}
+}
+
+
 /*
  * User Sign up
  */
@@ -50,7 +114,7 @@ function user_signUp($signUpData) {
 			$signUpData->id = $db->lastInsertId();
 			$db = null;
 			$signUpData_id= $signUpData->id;
-			$confirmation_link = $_SESSION['baseUrl'] . 'user/signup/confirmation?e=' . urlencode($signUpData->email) . '&h=' . $hash ;
+			$confirmation_link = $_SESSION['baseUrl'] . 'user/signup/confirmation/' . urlencode($signUpData->email) . '/' . $hash ;
 
 			// sending user registrattioin confirmation mail to user
 			$msg  = '
