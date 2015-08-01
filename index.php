@@ -33,6 +33,12 @@ use Respect\Validation\Validator as v;
  */
 $app = new \Slim\Slim();
 
+// Get request object
+$req = $app->request;
+session_start();
+//Get base URI
+$_SESSION['baseUrl'] = $req->getUrl()."/";
+
 
 $app->response->headers->set('Access-Control-Allow-Origin', '*');
 $app->response->headers->set('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
