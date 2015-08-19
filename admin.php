@@ -13,7 +13,7 @@ function users_list($app) {
 	rocuserstate as state, 
 	rocusermobile as mobile, 
 	rocuseraddress1 as address1, 
-	rocusersaddress2 as address2,
+	rocuseraddress2 as address2,
 	rocuserpincode as pincode 
 	FROM rocusers";
 	try {

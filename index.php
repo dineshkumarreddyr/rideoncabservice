@@ -43,7 +43,7 @@ $_SESSION['baseUrl'] = $req->getUrl()."/rideoncabservice/";
 $app->response->headers->set('Access-Control-Allow-Origin', '*');
 $app->response->headers->set('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
 $app->response->headers->set('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
- 
+
 /**
  * Step 3: Define the Slim application routes
  *
@@ -55,21 +55,21 @@ $app->response->headers->set('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Re
 
 // GET user details by userid route
 $app->get(
-  '/user/:rocuserid',
-  function ($rocuserid) use ($app) {
-    $response_data = user_data($rocuserid);
+	'/user/:rocuserid',
+	function ($rocuserid) use ($app) {
+		$response_data = user_data($rocuserid);
     // checking is user id available or not
-    if($response_data == '[]') {
+		if($response_data == '[]') {
     	// if user not aavailable with rocuserid throw 404
-    	$app->response->setStatus(404);
-    }
-    else {
+			$app->response->setStatus(404);
+		}
+		else {
     	// if user available throw user data
-    	$json_data = json_decode($response_data);
+			$json_data = json_decode($response_data);
     	$user_data = $json_data[0];	// swapping first array object
-			echo json_encode($user_data);
+    	echo json_encode($user_data);
     }
-  }
+}
 );
 
 // Delete User by userid route
@@ -78,28 +78,28 @@ $app->delete(
 	function ($rocuserid) use ($app) {
 		user_delete($app, $rocuserid);
 	}
-);
+	);
 
 // GET user signup email confirmation with hash code
 $app->get(
-  '/user/signup/confirmation/:email/:hash',
-  function ($email, $hash) use ($app) {
-    $response_data = user_signup_confirmation($app, $email, $hash);
-  }
-);
+	'/user/signup/confirmation/:email/:hash',
+	function ($email, $hash) use ($app) {
+		$response_data = user_signup_confirmation($app, $email, $hash);
+	}
+	);
 
 
 // User signUp route
 $app->post(
-    '/user/signup',
-    function () use ($app) {
+	'/user/signup',
+	function () use ($app) {
 		$request = \Slim\Slim::getInstance()->request();
 		$request_data = $request->getBody();
 		if(!isJson($request_data)) {
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -183,7 +183,7 @@ $app->post(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -201,23 +201,23 @@ $app->post(
 					$json_data = json_decode($response_data);
 		    	$user_data = $json_data[0];	// swapping first array object
 		    	echo json_encode($user_data);
-				}
-			}
+		    }
 		}
-  }
+	}
+}
 );
 
 // User register while book cab route
 $app->post(
-    '/user/register',
-    function () use ($app) {
+	'/user/register',
+	function () use ($app) {
 		$request = \Slim\Slim::getInstance()->request();
 		$request_data = $request->getBody();
 		if(!isJson($request_data)) {
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -322,7 +322,7 @@ $app->post(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -340,10 +340,10 @@ $app->post(
 					$json_data = json_decode($response_data);
 		    	$user_data = $json_data[0];	// swapping first array object
 		    	echo json_encode($user_data);
-				}
-			}
+		    }
 		}
-  }
+	}
+}
 );
 
 // User Login route
@@ -356,7 +356,7 @@ $app->post(
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -393,7 +393,7 @@ $app->post(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -411,9 +411,9 @@ $app->post(
     			$user_data = $response_json_data[0];	// swapping first array object
     			echo json_encode($user_data);
     		}
-			}
-		}
-	}
+    	}
+    }
+}
 );
 
 // User forgot password route
@@ -426,7 +426,7 @@ $app->post(
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -452,7 +452,7 @@ $app->post(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -462,19 +462,19 @@ $app->post(
 			}
 		}
 	}
-);
+	);
 
 // User update details route
 $app->put(
-    '/user/updatedetails/:userid',
-    function ($userid) use($app) {
+	'/user/updatedetails/:userid',
+	function ($userid) use($app) {
 		$request = \Slim\Slim::getInstance()->request();
 		$request_data = $request->getBody();
 		if(!isJson($request_data)) {
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -576,7 +576,7 @@ $app->put(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -591,12 +591,12 @@ $app->put(
 				}
 				else {
 					$app->response->setStatus(200);
-		    	echo $response_data;
+					echo $response_data;
 				}
 			}
-    }
-  }
-);
+		}
+	}
+	);
 
 // User Login route
 $app->put(
@@ -608,7 +608,7 @@ $app->put(
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -646,7 +646,7 @@ $app->put(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -661,11 +661,11 @@ $app->put(
 				}
 				else {
 					echo $response_data;
-	    		}
+				}
 			}
 		}
 	}
-);
+	);
 
 // List of Vendor SEARCH RESULT  route
 $app->post(
@@ -677,7 +677,7 @@ $app->post(
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -714,7 +714,7 @@ $app->post(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -724,7 +724,7 @@ $app->post(
 			}
 		}
 	}
-);
+	);
 
 // Cab Booking route
 $app->post(
@@ -736,7 +736,7 @@ $app->post(
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -883,7 +883,7 @@ $app->post(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -904,19 +904,19 @@ $app->post(
 			}
 		}
 	}
-);
+	);
 
 // Vendor signUp route
 $app->post(
-    '/vendor/signup',
-    function () use($app) {
+	'/vendor/signup',
+	function () use($app) {
 		$request = \Slim\Slim::getInstance()->request();
 		$request_data = $request->getBody();
 		if(!isJson($request_data)) {
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -1039,7 +1039,7 @@ $app->post(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -1057,10 +1057,10 @@ $app->post(
 					$json_data = json_decode($response_data);
 		    	$user_data = $json_data[0];	// swapping first array object
 		    	echo json_encode($user_data);
-				}
-			}
-    }
-  }
+		    }
+		}
+	}
+}
 );
 
 // Vendor Login route
@@ -1073,7 +1073,7 @@ $app->post(
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -1110,7 +1110,7 @@ $app->post(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -1128,9 +1128,9 @@ $app->post(
     			$vendor_data = $response_json_data;	// swapping first array object
     			echo json_encode($vendor_data);
     		}
-			}
-		}
-	}
+    	}
+    }
+}
 );
 
 // Delete vendor by vendorid route
@@ -1139,19 +1139,19 @@ $app->delete(
 	function ($rocvendorid) use ($app) {
 		vendor_delete($app, $rocvendrid);
 	}
-);
+	);
 
 // Vendor update details route
 $app->put(
-    '/vendor/updatedetails/:vendorid',
-    function ($vendorid) use($app) {
+	'/vendor/updatedetails/:vendorid',
+	function ($vendorid) use($app) {
 		$request = \Slim\Slim::getInstance()->request();
 		$request_data = $request->getBody();
 		if(!isJson($request_data)) {
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -1329,7 +1329,7 @@ $app->put(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -1344,12 +1344,12 @@ $app->put(
 				}
 				else {
 					$app->response->setStatus(200);
-		    	echo $response_data;
+					echo $response_data;
 				}
 			}
-    }
-  }
-);
+		}
+	}
+	);
 
 // Vendor forgot password route
 $app->post(
@@ -1361,7 +1361,7 @@ $app->post(
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -1387,7 +1387,7 @@ $app->post(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -1397,7 +1397,7 @@ $app->post(
 			}
 		}
 	}
-);
+	);
 
 // Vendor Change password route
 $app->put(
@@ -1409,7 +1409,7 @@ $app->put(
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -1447,7 +1447,7 @@ $app->put(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -1462,11 +1462,11 @@ $app->put(
 				}
 				else {
 					echo $response_data;
-	    		}
+				}
 			}
 		}
 	}
-);
+	);
 
 // vendor services
 $app->post(
@@ -1478,7 +1478,7 @@ $app->post(
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -1509,7 +1509,7 @@ $app->post(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -1519,24 +1519,24 @@ $app->post(
 			}
 		}
 	}
-);
+	);
 
 // GET Vendor Cab model by vendorid route
 $app->get(
-  '/vendor/cabmodel/:vendorid',
-  function ($vendorid) use ($app) {
-    $response_data = vendor_cabmodel_data($vendorid);
+	'/vendor/cabmodel/:vendorid',
+	function ($vendorid) use ($app) {
+		$response_data = vendor_cabmodel_data($vendorid);
     // checking is vendor id available or not
-    if($response_data == '[]') {
+		if($response_data == '[]') {
     	// if user not aavailable with rocuserid throw 404
-    	$app->response->setStatus(404);
-    }
-    else {
+			$app->response->setStatus(404);
+		}
+		else {
     	// if user available throw user data
-    	echo $response_data;
-    }
-  }
-);
+			echo $response_data;
+		}
+	}
+	);
 
 // vendor price
 $app->post(
@@ -1548,7 +1548,7 @@ $app->post(
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -1579,7 +1579,7 @@ $app->post(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -1589,7 +1589,7 @@ $app->post(
 			}
 		}
 	}
-);
+	);
 
 // update vendor price
 $app->put(
@@ -1598,7 +1598,7 @@ $app->put(
 		$request = \Slim\Slim::getInstance()->request();
 		update_vendorprices($app, $request->getBody());		
 	}
-);
+	);
 
 // vendor terms and conditions by vendor id
 $app->get(
@@ -1606,17 +1606,17 @@ $app->get(
 	function($vendorid) use($app) {
 		$response_data = get_vendorterms($vendorid);
 		// checking is vendor id available or not
-    if($response_data == '[]') {
+		if($response_data == '[]') {
     	// if terms not aavailable with vendorid throw 404
-    	$app->response->setStatus(404);
-    	echo $response_data;
-    }
-    else {
+			$app->response->setStatus(404);
+			echo $response_data;
+		}
+		else {
     	// if terms available throw terms data
-    	echo $response_data;
-    }
+			echo $response_data;
+		}
 	}
-);
+	);
 
 // Delete User by userid route
 $app->delete(
@@ -1624,7 +1624,7 @@ $app->delete(
 	function ($vendorid, $termid) use ($app) {
 		terms_delete($app, $vendorid, $termid);
 	}
-);
+	);
 
 // vendor terms and conditions
 $app->post(
@@ -1636,7 +1636,7 @@ $app->post(
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -1684,7 +1684,7 @@ $app->post(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -1694,7 +1694,7 @@ $app->post(
 			}
 		}
 	}
-);
+	);
 
 // update vendor terms and conditions
 $app->put(
@@ -1706,7 +1706,7 @@ $app->put(
 			$response = array(
 				'error' => 'Invalid JSON',
 				'error_description' => 'Invalid JSON'
-			);
+				);
 			$app->response->setStatus(400);
 			echo json_encode($response);
 		}
@@ -1765,7 +1765,7 @@ $app->put(
 				$response = array(
 					'error' => 'validation',
 					'fields' => $fields
-				);
+					);
 				$app->response->setStatus(400);
 				echo json_encode($response);
 			}
@@ -1775,95 +1775,95 @@ $app->put(
 			}
 		}
 	}
-);
+	);
 
 // GET cab services route
 $app->get(
-  '/cabservices',
-  function () use ($app) {
-    cabservices_data($app);
-  }
-);
+	'/cabservices',
+	function () use ($app) {
+		cabservices_data($app);
+	}
+	);
 
 // GET cab types route
 $app->get(
-  '/cabtypes',
-  function () use ($app) {
-    cabtypes_data($app);
-  }
-);
+	'/cabtypes',
+	function () use ($app) {
+		cabtypes_data($app);
+	}
+	);
 
 // GET cab models list route for auto list in manage service and vendor terms
 $app->get(
-  '/cabmodels',
-  function () use ($app) {
-    cabmodels_data($app);
-  }
-);
+	'/cabmodels',
+	function () use ($app) {
+		cabmodels_data($app);
+	}
+	);
 
 // GET manage services by vendor id route
 $app->get(
-  '/vendor/services/:vendorid',
-  function ($vendorid) use ($app) {
-    echo $response_data = vendor_services($vendorid);
-  }
-);
+	'/vendor/services/:vendorid',
+	function ($vendorid) use ($app) {
+		echo $response_data = vendor_services($vendorid);
+	}
+	);
 
 // DELETE manage services by vendor id route
 $app->delete(
-  '/vendor/prices/:vendorid/:vcid',
-  function ($vendorid, $vcid) use ($app) {
-    vendor_prices_delete($app, $vendorid, $vcid);
-  }
-);
+	'/vendor/prices/:vendorid/:vcid',
+	function ($vendorid, $vcid) use ($app) {
+		vendor_prices_delete($app, $vendorid, $vcid);
+	}
+	);
 
 // GET registered users route
 $app->get(
-  '/admin/users',
-  function () use ($app) {
-    users_list($app);
-  }
-);
+	'/admin/users',
+	function () use ($app) {
+		users_list($app);
+	}
+	);
 
 // GET registered users route
 $app->get(
-  '/admin/vendors',
-  function () use ($app) {
-    vendors_list($app);
-  }
-);
+	'/admin/vendors',
+	function () use ($app) {
+		vendors_list($app);
+	}
+	);
 
 // GET user bookings list route
 $app->get(
-  '/user/bookings/:userid',
-  function ($userid) use ($app) {
-    user_bookings_list($app, $userid);
-  }
-);
+	'/user/bookings/:userid',
+	function ($userid) use ($app) {
+		user_bookings_list($app, $userid);
+	}
+	);
 
 // GET admin bookings list route
 $app->get(
-  '/vendor/bookings/:vendorid',
-  function ($vendorid) use ($app) {
-    vendor_bookings_list($app, $vendorid);
-  }
-);
+	'/vendor/bookings/:vendorid',
+	function ($vendorid) use ($app) {
+		vendor_bookings_list($app, $vendorid);
+	}
+	);
 
 // GET admin bookings list route
 $app->get(
-  '/admin/bookings',
-  function () use ($app) {
-    bookings_list($app);
-  }
-);
+	'/admin/bookings',
+	function () use ($app) {
+		bookings_list($app);
+	}
+	);
 
 // GET admin bookings list route
 $app->get(
-  '/vendor/terms',
-  function () use ($app) {
-    vendor_terms($app);
-  }
-);
+	'/vendor/terms',
+	function () use ($app) {
+		vendor_terms($app);
+	}
+	);
 
 
 
@@ -1878,6 +1878,6 @@ $app->run();
 
 function isJson($string) {
 	// if($string == '' || $string == '{}') return FALSE;
-  json_decode($string);
-  return (json_last_error() == JSON_ERROR_NONE);
+	json_decode($string);
+	return (json_last_error() == JSON_ERROR_NONE);
 }
