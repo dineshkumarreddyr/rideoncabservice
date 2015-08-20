@@ -5,7 +5,7 @@ use Respect\Validation\Validator as v;
  */
 function search($search) {
 	$search = json_decode($search);
-	$sql = "SELECT DISTINCT(v.rocvendorid) as vendorid, vc.roccabtype as cabtype, vc.roccabmodelid as cabmodel, vc.rocchargeperkm as chargeperkm, v.rocvendorname as vendorname, v.rocvendoraddress as vendoraddress, v.rocvendorlogo as vendorlogo, v.rocvendorrating as vendorrating FROM rocvendorcharges vc, rocvendors v, roccabservices cs WHERE vc.rocvendorid = v.rocvendorid AND vc.roccabservicesid = :roccabservicesid";
+	$sql = "SELECT DISTINCT(v.rocvendorid) as vendorid, vc.roccabtype as cabtype, vc.roccabmodelid as cabmodel, vc.rocchargeperkm as chargeperkm, vc.rocchargeunitsperhour as chargeperhour, vc.roccabservicesid as servicetype, v.rocvendorname as vendorname, v.rocvendoraddress as vendoraddress, v.rocvendorlogo as vendorlogo, v.rocvendorrating as vendorrating FROM rocvendorcharges vc, rocvendors v, roccabservices cs WHERE vc.rocvendorid = v.rocvendorid AND vc.roccabservicesid = :roccabservicesid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
@@ -89,7 +89,16 @@ function bookCab($app, $bookingData) {
 			$msg  = '
 			<div class="wrapmain" style="padding:30px;text-align:center">
 		     <h2 style="font-size:30px;text-align:center;color:#e38e00;font-weight:700;margin-top:0;">Hi ' . $user_data->fname . '..!</h2>
-		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">' . $message . '</p>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Thank you for using RideOnCab!  We received your booking</p>
+		     <p style="font-size:14px;font-weight:bold;line-height:21px;color:#000;">BOOKING DETAILS</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Booking time : '.$bookingData->bookingdatetime.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Pickup addres : '.$bookingData->bookingfromlocation.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Drop Location : '.$bookingData->bookingtolocation.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Service type : '.$bookingData->servicename.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Cab model : '.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Booking ID : '.$transaction_id.'</p>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">This is not your confirmation ,Your Cab booking will be confirmed  in 15 mins .</p>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Thanks for using Rideoncab , have a great day.</p>
 		    </div>';
 			$subj = 'Ride on cab : Booking confirmation';
 			$to   = $user_data->email;
@@ -98,8 +107,18 @@ function bookCab($app, $bookingData) {
 			$msg  = '
 			<div class="wrapmain" style="padding:30px;text-align:center">
 		     <h2 style="font-size:30px;text-align:center;color:#e38e00;font-weight:700;margin-top:0;">Hi ' . $vendor_data->name . '..!</h2>
-		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">' . $message . '</p>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Greetings from rideoncab , You got  a Booking </p>
+		     <p style="font-size:14px;font-weight:bold;line-height:21px;color:#000;">BOOKING DETAILS</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Customer name : '.$user_data->fname.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Booking time : '.$bookingData->bookingdatetime.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Pickup addres : '.$bookingData->bookingfromlocation.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Drop Location : '.$bookingData->bookingtolocation.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Service type : '.$bookingData->servicename.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Cab model : '.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Booking ID : '.$transaction_id.'</p>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Please confirm the booking asap.</p>
 		    </div>';
+
 			$subj = 'Ride on cab : New Booking';
 			$to   = $vendor_data->email . ',' . 'bookings@rideoncab.com';
 
@@ -108,6 +127,87 @@ function bookCab($app, $bookingData) {
 			// return total booking info data
 			booking_info_data($app, $bookingData_id);
 		}
+	} catch(PDOException $e) {
+		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
+	}
+}
+
+
+/*
+ * Booking cab confirmation with driver details
+ */
+function bookConf($app, $bookingData) {
+//	return $bookingData;
+	$bookingData = json_decode($bookingData);
+	$sql = "UPDATE rocbookinginfo SET roccabregno = :roccabregno, rocdrivername = :rocdrivername, rocdrivermobile = :rocdrivermobile, rocbookingstatus = :rocbookingstatus WHERE rocbookinginfoid = :rocbookinginfoid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);  
+		$stmt->bindParam(":roccabregno", $bookingData->cabregno);
+		$stmt->bindParam(":rocdrivername", $bookingData->drivername);
+		$stmt->bindParam(":rocdrivermobile", $bookingData->drivermobile);
+		$stmt->bindParam(":rocbookingstatus", $bookingData->bookingstatus);
+		$stmt->bindParam(":rocbookinginfoid", $bookingData->bookingid);
+
+		$stmt->execute();
+		$db = null;
+		$bookingData_id = $bookingData->bookingid;
+
+		$sql = "SELECT bi.rocbookinginfoid as bid, bi.roctransactionid as transid, bi.rocservicetype as serviceid, cs.roccabservices as servicetype, bi.rocservicename as servicename, bi.rocservicechargeperkm scpkm, bi.rocservicekm as servicekm, bi.rocservicestimatedrs as sers, bi.rocbookingfromlocation bfl, bi.rocbookingtolocation as btl, bi.rocserviceclass as sc, bi.rocdrivername as dname, bi.rocdrivermobile as dmobile , bi.rocuserid as uid, bi.rocvendorid as vid, bi.rocbookingdatetime as bdatetime, bi.rocbookingstatus bstatus FROM rocbookinginfo bi, roccabservices cs WHERE bi.rocbookinginfoid = :rocbookinginfoid AND bi.rocservicetype = cs.roccabservicesid";
+		try {
+			$db = getDB();
+			$stmt = $db->prepare($sql); 
+			$stmt->bindParam("rocbookinginfoid", $bookingData_id);
+			$stmt->execute();
+			$bookingData = $stmt->fetch(PDO::FETCH_OBJ);
+			$db = null;
+
+
+			// generate and store transaction ID
+			
+			$user_data = json_decode(user_data($bookingData->uid));
+			$user_data = $user_data[0];
+
+			$mobile = $user_data->mobile;
+			$user_name = $user_data->fname;
+			// $message = "CAB successfully booked, Booking ID: " . $transaction_id;
+			$message = "Greetings from RideonCab. Your cab has been booked successfully. Vendor Name : ".$bookingData->dname." , Phone no : ".$bookingData->dmobile."  Thanks for using RideonCab, Have a nice day.";
+			// sending message to user with booking id
+			prepare_sms($mobile, $message);
+
+			// sending booking confirmation mail to user
+			$msg  = '
+			<div class="wrapmain" style="padding:30px;text-align:center">
+		     <h2 style="font-size:30px;text-align:center;color:#e38e00;font-weight:700;margin-top:0;">Hi ' . $user_data->fname . '..!</h2>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Thank you for using RideOnCab!  We received your booking</p>
+		     <p style="font-size:14px;font-weight:bold;line-height:21px;color:#000;">BOOKING DETAILS</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Booking time : '.$bookingData->bdatetime.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Pickup addres : '.$bookingData->bfl.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Drop Location : '.$bookingData->btl.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Service type : '.$bookingData->servicename.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Driver name : '.$bookingData->dname.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Driver Phone no : '.$bookingData->dmobile.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Booking ID : '.$bookingData->transid.'</p>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">This is not your confirmation ,Your Cab booking will be confirmed  in 15 mins .</p>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Thanks for using Rideoncab , have a great day.</p>
+		    </div>';
+			$subj = 'Ride on cab : Booking confirmation';
+			$to   = $user_data->email;
+			mailer($to, $subj, $msg);
+
+			// return total booking info data
+			booking_info_data($app, $bookingData_id);
+			$app->response->setStatus(200);
+
+
+		} catch(PDOException $e) {
+		    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+			echo '{"error":{"text":"'. $e->getMessage() .'""}}'; 
+			$app->response->setStatus(500);
+		}
+
 	} catch(PDOException $e) {
 		//error_log($e->getMessage(), 3, '/var/tmp/php.log');
 		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
@@ -140,7 +240,7 @@ function generate_transactionid($app, $bookingData_id = 0) {
  * total booking info data by booking id
  */
 function booking_info_data($app, $bookingData_id = 0) {
-	$sql = "SELECT bi.rocbookinginfoid as bid, bi.roctransactionid as transid, bi.rocservicetype as serviceid, cs.roccabservices as servicetype, bi.rocservicename as servicename, bi.rocservicechargeperkm scpkm, bi.rocservicekm as servicekm, bi.rocservicestimatedrs as sers, bi.rocbookingfromlocation bfl, bi.rocbookingtolocation as btl, bi.rocserviceclass as sc, bi.rocuserid as uid, bi.rocvendorid as vid, bi.rocbookingdatetime as bdatetime, bi.rocbookingstatus bstatus FROM rocbookinginfo bi, roccabservices cs WHERE bi.rocbookinginfoid = :rocbookinginfoid AND bi.rocservicetype = cs.roccabservicesid";
+	$sql = "SELECT bi.rocbookinginfoid as bid, bi.roctransactionid as transid, bi.rocservicetype as serviceid, cs.roccabservices as servicetype, bi.rocservicename as servicename, bi.rocservicechargeperkm scpkm, bi.rocservicekm as servicekm, bi.rocservicestimatedrs as sers, bi.rocbookingfromlocation bfl, bi.rocbookingtolocation as btl, bi.rocserviceclass as sc, bi.rocdrivername as dname, bi.rocdrivermobile as dmobile, bi.rocuserid as uid, bi.rocvendorid as vid, bi.rocbookingdatetime as bdatetime, bi.rocbookingstatus bstatus FROM rocbookinginfo bi, roccabservices cs WHERE bi.rocbookinginfoid = :rocbookinginfoid AND bi.rocservicetype = cs.roccabservicesid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 

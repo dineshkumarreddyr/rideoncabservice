@@ -906,6 +906,110 @@ $app->post(
 	}
 	);
 
+
+// Cab Booking confirmation route
+$app->post(
+	'/bookconf',
+	function () use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+				);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$request_data = json_decode($request_data);
+			$fields = array(); // error fields array creation
+			$error = FALSE; // validation error checking variable
+			// checking booking id is empty or not 
+			if(isset($request_data->bookingid)) {
+				if(!v::string()->notEmpty()->validate($request_data->bookingid)) {
+					$fields['bookingid'] = "Booking ID should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['bookingid'] = "Booking ID required";
+				$error = TRUE;
+			}
+			// checking cab reg no is empty or not 
+			if(isset($request_data->cabregno)) {
+				if(!v::string()->notEmpty()->validate($request_data->cabregno)) {
+					$fields['cabregno'] = "Cab Reg no should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['cabregno'] = "Cab Reg no required";
+				$error = TRUE;
+			}
+			// checking driver name is empty or not 
+			if(isset($request_data->drivername)) {
+				if(!v::string()->notEmpty()->validate($request_data->drivername)) {
+					$fields['drivername'] = "Driver name should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['drivername'] = "Driver name required";
+				$error = TRUE;
+			}
+			// checking driver mobile is empty or not 
+			if(isset($request_data->drivermobile)) {
+				if(!v::string()->notEmpty()->validate($request_data->drivermobile)) {
+					$fields['drivermobile'] = "Driver mobile should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['drivermobile'] = "Driver mobile required";
+				$error = TRUE;
+			}
+			// checking booking status is empty or not 
+			if(isset($request_data->bookingstatus)) {
+				if(!v::string()->notEmpty()->validate($request_data->bookingstatus)) {
+					$fields['bookingstatus'] = "Booking status should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['bookingstatus'] = "Booking status required";
+				$error = TRUE;
+			}
+			
+			// Checking is validation errors there
+			if($error) {
+				// If any validation errors
+				$response = array(
+					'error' => 'validation',
+					'fields' => $fields
+					);
+				$app->response->setStatus(400);
+				echo json_encode($response);
+			}
+			else {
+				// If no validation errors
+				bookConf($app, $request->getBody());
+				/*$response_json_data = json_decode($response_data);
+				// checking is cab successfully booked or not
+				if(isset($response_json_data->error)) {
+					$app->response->setStatus(409);
+					echo $response_data;
+				}
+				else {
+					// book cab and throw booking id
+					$app->response->setStatus(201);
+					echo $response_data;
+				}*/
+			}
+		}
+	}
+	);
+
 // Vendor signUp route
 $app->post(
 	'/vendor/signup',

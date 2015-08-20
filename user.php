@@ -515,6 +515,20 @@ function contact_us($app, $request_data)
 			$db = null;
 			$contact_id= $request_data->id;
 
+			$msg  = '
+			<div class="wrapmain" style="padding:30px;text-align:center">
+		     <h2 style="font-size:30px;text-align:center;color:#e38e00;font-weight:700;margin-top:0;">Hi..!</h2>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;"> Name : ' . $request_data->name . '</p>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;"> Email : ' . $request_data->email . '</p>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;"> Mobile : ' . $request_data->mobile . '</p>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;"> Subject : ' . $request_data->subject . '</p>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;"> Message : ' . $request_data->msg . '</p>
+		    </div>';
+			$subj = 'Ride on cab : New contact request FROM '. $request_data->name;
+			$to   = 'info@rideoncab.com';
+
+			mailer($to, $subj, $msg);
+
 			$app->response->setStatus(200);
 			$status_data = array("result" => "success", "message" => "Contact us successfully submited..");
 			echo json_encode($status_data);
