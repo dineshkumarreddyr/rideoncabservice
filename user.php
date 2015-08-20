@@ -421,4 +421,138 @@ function user_bookings_list($app, $userid) {
 		$app->response->setStatus(500);
 	}
 }
+
+/*
+ * contact_us 
+ */
+function contact_us($app, $request_data)
+{
+	$request_data = json_decode($request_data);
+	$fields = array(); // error fields array creation
+	$error = FALSE; // validation error checking variable
+	// checking name is empty or not 
+	if(isset($request_data->name)) {
+		if(!v::string()->notEmpty()->validate($request_data->name)) {
+			$fields['name'] = "Name should not be empty";
+			$error = TRUE;
+		}
+	}
+	else {
+		$fields['name'] = "Name required";
+		$error = TRUE;
+	}
+	// checking email is empty or not 
+	if(isset($request_data->email)) {
+		if(!v::string()->notEmpty()->validate($request_data->email)) {
+			$fields['email'] = "Email should not be empty";
+			$error = TRUE;
+		}
+	}
+	else {
+		$fields['email'] = "Email required";
+		$error = TRUE;
+	}
+	// checking mobile is empty or not 
+	if(isset($request_data->mobile)) {
+		if(!v::string()->notEmpty()->validate($request_data->mobile)) {
+			$fields['mobile'] = "Mobile should not be empty";
+			$error = TRUE;
+		}
+	}
+	else {
+		$fields['mobile'] = "Mobile required";
+		$error = TRUE;
+	}
+
+	// checking subject is empty or not 
+	if(isset($request_data->subject)) {
+		if(!v::string()->notEmpty()->validate($request_data->subject)) {
+			$fields['subject'] = "Subject should not be empty";
+			$error = TRUE;
+		}
+	}
+	else {
+		$fields['subject'] = "Subject required";
+		$error = TRUE;
+	}
+
+	// checking msg is empty or not 
+	if(isset($request_data->msg)) {
+		if(!v::string()->notEmpty()->validate($request_data->msg)) {
+			$fields['msg'] = "Message should not be empty";
+			$error = TRUE;
+		}
+	}
+	else {
+		$fields['msg'] = "Message required";
+		$error = TRUE;
+	}
+
+	// Checking is validation errors there
+	if($error) {
+		// If any validation errors
+		$response = array(
+			'error' => 'validation',
+			'fields' => $fields
+			);
+		$app->response->setStatus(400);
+		echo json_encode($response);
+	}
+	else {
+		// If no validation errors
+		$sql = "INSERT INTO roccontactus (roccontactname, roccontactemail, roccontactmobile, roccontactsubject, roccontactmsg) VALUES (:roccontactname, :roccontactemail, :roccontactmobile, :roccontactsubject, :roccontactmsg)";
+		try {
+			$db = getDB();
+			$stmt = $db->prepare($sql);  
+			$stmt->bindParam(":roccontactname", $request_data->name);
+			$stmt->bindParam(":roccontactemail", $request_data->email);
+			$stmt->bindParam(":roccontactmobile", $request_data->mobile);
+			$stmt->bindParam(":roccontactsubject", $request_data->subject);
+			$stmt->bindParam(":roccontactmsg", $request_data->msg);
+
+			$stmt->execute();
+			$request_data->id = $db->lastInsertId();
+			$db = null;
+			$contact_id= $request_data->id;
+
+			$app->response->setStatus(200);
+			$status_data = array("result" => "success", "message" => "Contact us successfully submited..");
+			echo json_encode($status_data);
+		} catch(PDOException $e) {
+			//error_log($e->getMessage(), 3, '/var/tmp/php.log');
+			echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+			$app->response->setStatus(500);
+		}
+	}
+}
+
+/*
+ * Get available cities 
+ */
+function get_cities($app)
+{
+	$sql = "SELECT roccityid as cid, roccityname as city FROM roccities WHERE roccitystatus = '1'";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);
+		$stmt->execute();		
+		$cities_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		$count = count($cities_data);
+		if($count) {
+			$cities_data = array("total" => $count, "results" => $cities_data);
+			echo json_encode($cities_data);
+			$app->response->setStatus(200);
+		}
+		else {
+			$cities_data = array("total" => 0, "results" => array());
+			echo json_encode($cities_data);
+			$app->response->setStatus(200);
+		}
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
+	}
+}
 ?>

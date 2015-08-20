@@ -1865,6 +1865,34 @@ $app->get(
 	}
 	);
 
+// GET cities list route
+$app->get(
+	'/cities',
+	function () use ($app) {
+		get_cities($app);
+	}
+	);
+
+// POST contactus form submit
+$app->post(
+	'/contact',
+	function () use ($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+				);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			contact_us($app, $request_data);
+		}
+	}
+	);
+
 
 
 $app->contentType('application/json');
