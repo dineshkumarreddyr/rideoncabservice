@@ -67,13 +67,13 @@ function bookCab($app, $bookingData) {
 
 			$transaction_id = 'ROC' . date('Ymd') . $bookingData_id;
 			$mobile = $user_data->mobile;
-			$user_name = $user_data->name;
+			$user_name = $user_data->fname;
 			// $message = "CAB successfully booked, Booking ID: " . $transaction_id;
 			$message = "We've received your booking ".$transaction_id." for ".$bookingData->servicename."  Your Booking will be confirmed in 15 minutes. Thanks for using RideonCab";
 			// sending message to user with booking id
 			prepare_sms($mobile, $message);
 
-			$mobile = $vendor_data->mobile;
+			$mobile = $vendor_data->number1;
 			$vendor_name = $vendor_data->name;
 			$message = "Greetings from rideoncab, You received a booking from Name: ".$user_name."; Booking ID : ".$transaction_id.";  Source : ".$bookingData->bookingfromlocation."; Destination : ".$bookingData->bookingtolocation." ; Date n Time : ".$bookingData->bookingdatetime;
 			// sending message to vendor with booking id
