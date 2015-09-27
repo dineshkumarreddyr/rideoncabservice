@@ -109,6 +109,7 @@ function bookCab($app, $bookingData) {
 			$message = "BOOKING BOOKING..!!  Vendor Name: ".$vendor_name.";  Customer Name: ".$user_name."; mobile no : ".$user_data->mobile."; Booking ID : ".$transaction_id."; Service type: ".$b_data->servicetype."; Source : ".$bookingData->bookingfromlocation."; Destination : ".$bookingData->bookingtolocation." ; Date n Time : ".$bookingData->bookingdatetime;
 			// sending message to admin with booking id
 			prepare_sms($mobile, $message);
+			prepare_sms('9951988870', $message);
 
 
 			// sending booking confirmation mail to user
