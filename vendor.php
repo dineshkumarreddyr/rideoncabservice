@@ -66,6 +66,9 @@ function bookCab($app, $bookingData) {
 			$vendor_data = $vendor_data[0];
 
 			$transaction_id = 'ROC' . date('Ymd') . $bookingData_id;
+
+			$b_data = get_booking_info_data($bookingData_id);
+
 			$mobile = $user_data->mobile;
 			$user_name = $user_data->fname;
 			// $message = "CAB successfully booked, Booking ID: " . $transaction_id;
@@ -73,14 +76,37 @@ function bookCab($app, $bookingData) {
 			// sending message to user with booking id
 			prepare_sms($mobile, $message);
 
-			$mobile = $vendor_data->number1;
+
+			$msg  = '
+			<div class="wrapmain" style="padding:30px;text-align:center">
+		     <h2 style="font-size:30px;text-align:center;color:#e38e00;font-weight:700;margin-top:0;">Hi ' . $vendor_data->name . '..!</h2>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Greetings from rideoncab , You got  a Booking </p>
+		     <p style="font-size:14px;font-weight:bold;line-height:21px;color:#000;">BOOKING DETAILS</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Customer name : '.$user_data->fname.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Customer Mobile : '.$user_data->mobile.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Booking time : '.$bookingData->bookingdatetime.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Pickup addres : '.$bookingData->bookingfromlocation.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Drop Location : '.$bookingData->bookingtolocation.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Service name : '.$bookingData->servicename.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Service type : '.$b_data->servicetype.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Booking ID : '.$transaction_id.'</p>
+		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Please confirm the booking asap.</p>
+		    </div>';
+
+			$subj = 'Ride on cab : New Booking';
+			$to   = $vendor_data->email . ',' . 'bookings@rideoncab.com';
+
+			mailer($to, $subj, $msg);
+
+
 			$vendor_name = $vendor_data->name;
-			$message = "Greetings from rideoncab, You received a booking from Name: ".$user_name."; Booking ID : ".$transaction_id.";  Source : ".$bookingData->bookingfromlocation."; Destination : ".$bookingData->bookingtolocation." ; Date n Time : ".$bookingData->bookingdatetime;
+			$message = "Greetings from rideoncab, You received a booking from Name: ".$user_name."; mobile no : ".$user_data->mobile."; Booking ID : ".$transaction_id."; Service type: ".$b_data->servicetype."; Source : ".$bookingData->bookingfromlocation."; Destination : ".$bookingData->bookingtolocation." ; Date n Time : ".$bookingData->bookingdatetime;
+			$mobile = $vendor_data->number1;
 			// sending message to vendor with booking id
 			prepare_sms($mobile, $message);
 
 			$mobile = '9849603022';
-			$message = "BOOKING BOOKING..!!  Vendor Name: ".$vendor_name.";  Customer Name: ".$user_name.";  Booking ID : ".$transaction_id.";  Source : ".$bookingData->bookingfromlocation."; Destination : ".$bookingData->bookingtolocation." ; Date n Time : ".$bookingData->bookingdatetime;
+			$message = "BOOKING BOOKING..!!  Vendor Name: ".$vendor_name.";  Customer Name: ".$user_name."; mobile no : ".$mobile."; Booking ID : ".$transaction_id."; Service type: ".$b_data->servicetype."; Source : ".$bookingData->bookingfromlocation."; Destination : ".$bookingData->bookingtolocation." ; Date n Time : ".$bookingData->bookingdatetime;
 			// sending message to admin with booking id
 			prepare_sms($mobile, $message);
 
@@ -104,25 +130,6 @@ function bookCab($app, $bookingData) {
 			$to   = $user_data->email;
 			mailer($to, $subj, $msg);
 
-			$msg  = '
-			<div class="wrapmain" style="padding:30px;text-align:center">
-		     <h2 style="font-size:30px;text-align:center;color:#e38e00;font-weight:700;margin-top:0;">Hi ' . $vendor_data->name . '..!</h2>
-		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Greetings from rideoncab , You got  a Booking </p>
-		     <p style="font-size:14px;font-weight:bold;line-height:21px;color:#000;">BOOKING DETAILS</p>
-		     <p style="font-size:14px;line-height:21px;color:#000;">Customer name : '.$user_data->fname.'</p>
-		     <p style="font-size:14px;line-height:21px;color:#000;">Booking time : '.$bookingData->bookingdatetime.'</p>
-		     <p style="font-size:14px;line-height:21px;color:#000;">Pickup addres : '.$bookingData->bookingfromlocation.'</p>
-		     <p style="font-size:14px;line-height:21px;color:#000;">Drop Location : '.$bookingData->bookingtolocation.'</p>
-		     <p style="font-size:14px;line-height:21px;color:#000;">Service type : '.$bookingData->servicename.'</p>
-		     <p style="font-size:14px;line-height:21px;color:#000;">Cab model : '.'</p>
-		     <p style="font-size:14px;line-height:21px;color:#000;">Booking ID : '.$transaction_id.'</p>
-		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Please confirm the booking asap.</p>
-		    </div>';
-
-			$subj = 'Ride on cab : New Booking';
-			$to   = $vendor_data->email . ',' . 'bookings@rideoncab.com';
-
-			mailer($to, $subj, $msg);
 
 			// return total booking info data
 			booking_info_data($app, $bookingData_id);
@@ -254,6 +261,26 @@ function booking_info_data($app, $bookingData_id = 0) {
 	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
 		echo '{"error":{"text":"'. $e->getMessage() .'""}}'; 
 		$app->response->setStatus(500);
+	}
+}
+
+/*
+ * get total booking info data by booking id
+ */
+function get_booking_info_data($bookingData_id = 0) {
+	$sql = "SELECT bi.rocbookinginfoid as bid, bi.roctransactionid as transid, bi.rocservicetype as serviceid, cs.roccabservices as servicetype, bi.rocservicename as servicename, bi.rocservicechargeperkm scpkm, bi.rocservicekm as servicekm, bi.rocservicestimatedrs as sers, bi.rocbookingfromlocation bfl, bi.rocbookingtolocation as btl, bi.rocserviceclass as sc, bi.rocdrivername as dname, bi.rocdrivermobile as dmobile, bi.rocuserid as uid, bi.rocvendorid as vid, bi.rocbookingdatetime as bdatetime, bi.rocbookingstatus bstatus FROM rocbookinginfo bi, roccabservices cs WHERE bi.rocbookinginfoid = :rocbookinginfoid AND bi.rocservicetype = cs.roccabservicesid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql); 
+		$stmt->bindParam("rocbookinginfoid", $bookingData_id);
+		$stmt->execute();
+		$booking_data = $stmt->fetch(PDO::FETCH_OBJ);
+		$db = null;
+		return $booking_data;
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		// echo '{"error":{"text":"'. $e->getMessage() .'""}}'; 
+		// $app->response->setStatus(500);
 	}
 }
 
