@@ -106,7 +106,7 @@ function bookCab($app, $bookingData) {
 			prepare_sms($mobile, $message);
 
 			$mobile = '9849603022';
-			$message = "BOOKING BOOKING..!!  Vendor Name: ".$vendor_name.";  Customer Name: ".$user_name."; mobile no : ".$mobile."; Booking ID : ".$transaction_id."; Service type: ".$b_data->servicetype."; Source : ".$bookingData->bookingfromlocation."; Destination : ".$bookingData->bookingtolocation." ; Date n Time : ".$bookingData->bookingdatetime;
+			$message = "BOOKING BOOKING..!!  Vendor Name: ".$vendor_name.";  Customer Name: ".$user_name."; mobile no : ".$user_data->mobile."; Booking ID : ".$transaction_id."; Service type: ".$b_data->servicetype."; Source : ".$bookingData->bookingfromlocation."; Destination : ".$bookingData->bookingtolocation." ; Date n Time : ".$bookingData->bookingdatetime;
 			// sending message to admin with booking id
 			prepare_sms($mobile, $message);
 
@@ -120,8 +120,8 @@ function bookCab($app, $bookingData) {
 		     <p style="font-size:14px;line-height:21px;color:#000;">Booking time : '.$bookingData->bookingdatetime.'</p>
 		     <p style="font-size:14px;line-height:21px;color:#000;">Pickup addres : '.$bookingData->bookingfromlocation.'</p>
 		     <p style="font-size:14px;line-height:21px;color:#000;">Drop Location : '.$bookingData->bookingtolocation.'</p>
-		     <p style="font-size:14px;line-height:21px;color:#000;">Service type : '.$bookingData->servicename.'</p>
-		     <p style="font-size:14px;line-height:21px;color:#000;">Cab model : '.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Service name : '.$bookingData->servicename.'</p>
+		     <p style="font-size:14px;line-height:21px;color:#000;">Service type : '.$b_data->servicetype.'</p>
 		     <p style="font-size:14px;line-height:21px;color:#000;">Booking ID : '.$transaction_id.'</p>
 		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">This is not your confirmation ,Your Cab booking will be confirmed  in 15 mins .</p>
 		     <p style="font-size:15px;line-height:21px;color:#000;text-align:center;">Thanks for using Rideoncab , have a great day.</p>
