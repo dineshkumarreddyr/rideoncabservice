@@ -378,7 +378,7 @@ function vendor_login($loginData) {
  */
 function vendor_data($rocvendorid, $mode = 'mini') {
 	if($mode == 'full') {
-		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendorcontactperson as contactperson, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendoraddress as address, rocvendoremail as email, rocvendorexp as exp, rocvendornocif as nocif, rocvendorfname as fname, rocvendorfemail as femail, rocvendorslocation as slocation, rocvendortlproof as tlproof, rocvendortcards as tcards, rocvendortarrif as tarrif, rocvendorlandline as landline FROM rocvendors WHERE  rocvendorid = :rocvendorid";
+		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendorcontactperson as contactperson, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendoraddress as address, rocvendoremail as email, rocvendorexp as exp, rocvendornocif as nocif, rocvendorfname as fname, rocvendorfemail as femail, rocvendorslocation as slocation, rocvendortlproof as tlproof, rocvendortcards as tcards, rocvendortarrif as tarrif, rocvendorlandline as landline, rocvendorterms as terms FROM rocvendors WHERE  rocvendorid = :rocvendorid";
 	}
 	else {
 		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendoraddress as address, rocvendoremail as email, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendorusername as username, rocvendorcontactperson as contactperson, rocvendorlogo as logo FROM rocvendors WHERE  rocvendorid = :rocvendorid";
@@ -404,7 +404,7 @@ function vendor_data($rocvendorid, $mode = 'mini') {
 function vendor_updatedetails($vendorid, $updateDetails) {
 	// if(!vendor_signUpCheck($signUpData)) {
 		$updateDetails = json_decode($updateDetails);
-		$sql = "UPDATE rocvendors SET rocvendorname = :rocvendorname, rocvendorcontactperson = :rocvendorcontactperson, rocvendornumber1 = :rocvendornumber1, rocvendornumber2 = :rocvendornumber2, rocvendoraddress = :rocvendoraddress, rocvendorexp = :rocvendorexp,  rocvendornocif = :rocvendornocif, rocvendorfname = :rocvendorfname, rocvendorfemail = :rocvendorfemail, rocvendorslocation = :rocvendorslocation, rocvendortlproof = :rocvendortlproof, rocvendortcards =:rocvendortcards, rocvendortarrif = :rocvendortarrif, rocvendorlandline = :rocvendorlandline WHERE rocvendorid = :rocvendorid";
+		$sql = "UPDATE rocvendors SET rocvendorname = :rocvendorname, rocvendorcontactperson = :rocvendorcontactperson, rocvendornumber1 = :rocvendornumber1, rocvendornumber2 = :rocvendornumber2, rocvendoraddress = :rocvendoraddress, rocvendorexp = :rocvendorexp,  rocvendornocif = :rocvendornocif, rocvendorfname = :rocvendorfname, rocvendorfemail = :rocvendorfemail, rocvendorslocation = :rocvendorslocation, rocvendortlproof = :rocvendortlproof, rocvendortcards =:rocvendortcards, rocvendortarrif = :rocvendortarrif, rocvendorlandline = :rocvendorlandline, rocvendorterms = :rocvendorterms WHERE rocvendorid = :rocvendorid";
 		try {
 			$db = getDB();
 			$stmt = $db->prepare($sql);  
@@ -422,6 +422,7 @@ function vendor_updatedetails($vendorid, $updateDetails) {
 			$stmt->bindParam(":rocvendortcards", $updateDetails->tcards);
 			$stmt->bindParam(":rocvendortarrif", $updateDetails->tarrif);
 			$stmt->bindParam(":rocvendorlandline", $updateDetails->landline);
+			$stmt->bindParam(":rocvendorterms", $updateDetails->terms);
 			$stmt->bindParam(":rocvendorid", $vendorid);
 
 			$stmt->execute();
@@ -1072,7 +1073,7 @@ function vendor_bookings_list($app, $vendorid) {
 }
 
 function vendor_terms($app) {
-	$sql = "SELECT rocvendortermsid as vtid, rocvendorid as vid, roccabmodelid as cabmodel, rocvendorterms as terms FROM rocvendorterms";
+	$sql = "SELECT vt.rocvendortermsid as vtid, vt.rocvendorid as vid, vt.roccabmodelid as cabmodel, CONCAT(vt.rocvendorterms, ' \n ', v.rocvendorterms) as terms FROM rocvendorterms vt, rocvendors v WHERE v.rocvendorid = vt.rocvendorid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
