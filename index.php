@@ -707,6 +707,18 @@ $app->post(
 				$fields['servicetype'] = "Service type required";
 				$error = TRUE;
 			}
+
+			// checking user location is empty or not 
+			if(isset($request_data->base_loc)) {
+				if(!v::string()->notEmpty()->validate($request_data->base_loc)) {
+					$fields['servicetype'] = "base location should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['base_loc'] = "base location required";
+				$error = TRUE;
+			}
 			
 			// Checking is validation errors there
 			if($error) {

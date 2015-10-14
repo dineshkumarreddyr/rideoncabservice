@@ -5,12 +5,13 @@ use Respect\Validation\Validator as v;
  */
 function search($search) {
 	$search = json_decode($search);
-	$sql = "SELECT DISTINCT(v.rocvendorid) as vendorid, vc.roccabtype as cabtype, vc.roccabmodelid as cabmodel, vc.rocchargeperkm as chargeperkm, vc.rocchargeunitsperhour as chargeperhour, vc.roccabservicesid as servicetype, v.rocvendorname as vendorname, v.rocvendoraddress as vendoraddress, v.rocvendorlogo as vendorlogo, v.rocvendorrating as vendorrating FROM rocvendorcharges vc, rocvendors v, roccabservices cs WHERE vc.rocvendorid = v.rocvendorid AND vc.roccabservicesid = :roccabservicesid";
+	$sql = "SELECT DISTINCT(v.rocvendorid) as vendorid, vc.roccabtype as cabtype, vc.roccabmodelid as cabmodel, vc.rocchargeperkm as chargeperkm, vc.rocchargeunitsperhour as chargeperhour, vc.roccabservicesid as servicetype, v.rocvendorname as vendorname, v.rocvendoraddress as vendoraddress, v.rocvendorlogo as vendorlogo, v.rocvendorrating as vendorrating FROM rocvendorcharges vc, rocvendors v, roccabservices cs WHERE vc.rocvendorid = v.rocvendorid AND vc.roccabservicesid = :roccabservicesid AND v.rocvendorslocation = :rocvendorslocation";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
 		// $stmt->bindParam("roccabtype", $search->cabtype);
 		$stmt->bindParam("roccabservicesid", $search->servicetype);
+		$stmt->bindParam("rocvendorslocation", $search->base_loc);
 		$stmt->execute();
 		$search_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
