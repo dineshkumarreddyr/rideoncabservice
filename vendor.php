@@ -5,13 +5,13 @@ use Respect\Validation\Validator as v;
  */
 function search($search) {
 	$search = json_decode($search);
-	$sql = "SELECT DISTINCT(v.rocvendorid) as vendorid, vc.roccabtype as cabtype, vc.roccabmodelid as cabmodel, vc.rocchargeperkm as chargeperkm, vc.rocchargeunitsperhour as chargeperhour, vc.roccabservicesid as servicetype, v.rocvendorname as vendorname, v.rocvendoraddress as vendoraddress, v.rocvendorlogo as vendorlogo, v.rocvendorrating as vendorrating FROM rocvendorcharges vc, rocvendors v, roccabservices cs WHERE vc.rocvendorid = v.rocvendorid AND vc.roccabservicesid = :roccabservicesid AND v.rocvendorslocation = :rocvendorslocation";
+	$sql = "SELECT DISTINCT(v.rocvendorid) as vendorid, vc.roccabtype as cabtype, vc.roccabmodelid as cabmodel, vc.rocchargeperkm as chargeperkm, vc.rocchargeunitsperhour as chargeperhour, vc.roccabservicesid as servicetype, v.rocvendorname as vendorname, v.rocvendoraddress as vendoraddress, v.rocvendorlogo as vendorlogo, v.rocvendorrating as vendorrating FROM rocvendorcharges vc, rocvendors v, roccabservices cs WHERE vc.rocvendorid = v.rocvendorid AND vc.roccabservicesid = :roccabservicesid AND v.rocvendorcity = :rocvendorcity";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
 		// $stmt->bindParam("roccabtype", $search->cabtype);
 		$stmt->bindParam("roccabservicesid", $search->servicetype);
-		$stmt->bindParam("rocvendorslocation", $search->base_loc);
+		$stmt->bindParam("rocvendorcity", $search->base_loc);
 		$stmt->execute();
 		$search_data = $stmt->fetchAll(PDO::FETCH_OBJ);
 		$db = null;
@@ -378,7 +378,7 @@ function vendor_login($loginData) {
  */
 function vendor_data($rocvendorid, $mode = 'mini') {
 	if($mode == 'full') {
-		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendorcontactperson as contactperson, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendoraddress as address, rocvendoremail as email, rocvendorexp as exp, rocvendornocif as nocif, rocvendorfname as fname, rocvendorfemail as femail, rocvendorslocation as slocation, rocvendortlproof as tlproof, rocvendortcards as tcards, rocvendortarrif as tarrif, rocvendorlandline as landline, rocvendorterms as terms FROM rocvendors WHERE  rocvendorid = :rocvendorid";
+		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendorcontactperson as contactperson, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendoraddress as address, rocvendoremail as email, rocvendorexp as exp, rocvendornocif as nocif, rocvendorfname as fname, rocvendorfemail as femail, rocvendorslocation as slocation, rocvendorcity as city, rocvendorstate as state, rocvendortlproof as tlproof, rocvendortcards as tcards, rocvendortarrif as tarrif, rocvendorlandline as landline, rocvendorterms as terms FROM rocvendors WHERE  rocvendorid = :rocvendorid";
 	}
 	else {
 		$sql = "SELECT rocvendorid as vid, rocvendorname as name, rocvendoraddress as address, rocvendoremail as email, rocvendornumber1 as number1, rocvendornumber2 as number2, rocvendorusername as username, rocvendorcontactperson as contactperson, rocvendorlogo as logo FROM rocvendors WHERE  rocvendorid = :rocvendorid";
