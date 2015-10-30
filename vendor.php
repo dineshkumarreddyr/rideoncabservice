@@ -404,7 +404,7 @@ function vendor_data($rocvendorid, $mode = 'mini') {
 function vendor_updatedetails($vendorid, $updateDetails) {
 	// if(!vendor_signUpCheck($signUpData)) {
 		$updateDetails = json_decode($updateDetails);
-		$sql = "UPDATE rocvendors SET rocvendorname = :rocvendorname, rocvendorcontactperson = :rocvendorcontactperson, rocvendornumber1 = :rocvendornumber1, rocvendornumber2 = :rocvendornumber2, rocvendoraddress = :rocvendoraddress, rocvendorexp = :rocvendorexp,  rocvendornocif = :rocvendornocif, rocvendorfname = :rocvendorfname, rocvendorfemail = :rocvendorfemail, rocvendorslocation = :rocvendorslocation, rocvendortlproof = :rocvendortlproof, rocvendortcards =:rocvendortcards, rocvendortarrif = :rocvendortarrif, rocvendorlandline = :rocvendorlandline, rocvendorterms = :rocvendorterms WHERE rocvendorid = :rocvendorid";
+		$sql = "UPDATE rocvendors SET rocvendorname = :rocvendorname, rocvendorcontactperson = :rocvendorcontactperson, rocvendornumber1 = :rocvendornumber1, rocvendornumber2 = :rocvendornumber2, rocvendoraddress = :rocvendoraddress, rocvendorexp = :rocvendorexp,  rocvendornocif = :rocvendornocif, rocvendorfname = :rocvendorfname, rocvendorfemail = :rocvendorfemail, rocvendorslocation = :rocvendorslocation, rocvendorcity = :rocvendorcity, rocvendorsstate = :rocvendorstate, rocvendortlproof = :rocvendortlproof, rocvendortcards =:rocvendortcards, rocvendortarrif = :rocvendortarrif, rocvendorlandline = :rocvendorlandline, rocvendorterms = :rocvendorterms WHERE rocvendorid = :rocvendorid";
 		try {
 			$db = getDB();
 			$stmt = $db->prepare($sql);  
@@ -418,6 +418,8 @@ function vendor_updatedetails($vendorid, $updateDetails) {
 			$stmt->bindParam(":rocvendorfname", $updateDetails->fname);
 			$stmt->bindParam(":rocvendorfemail", $updateDetails->femail);
 			$stmt->bindParam(":rocvendorslocation", $updateDetails->slocation);
+			$stmt->bindParam(":rocvendorcity", $updateDetails->city);
+			$stmt->bindParam(":rocvendorstate", $updateDetails->state);
 			$stmt->bindParam(":rocvendortlproof", $updateDetails->tlproof);
 			$stmt->bindParam(":rocvendortcards", $updateDetails->tcards);
 			$stmt->bindParam(":rocvendortarrif", $updateDetails->tarrif);

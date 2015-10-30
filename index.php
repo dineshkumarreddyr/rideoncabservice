@@ -1396,6 +1396,28 @@ $app->put(
 				$fields['slocation'] = "Service Location required";
 				$error = TRUE;
 			}
+			// checking City is empty or not 
+			if(isset($request_data->city)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->slocation)) {
+					$fields['slocation'] = "Service Location should not be empty";
+					$error = TRUE;
+				}*/
+			}
+			else {
+				$fields['city'] = "City required";
+				$error = TRUE;
+			}
+			// checking State is empty or not 
+			if(isset($request_data->state)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->slocation)) {
+					$fields['slocation'] = "Service Location should not be empty";
+					$error = TRUE;
+				}*/
+			}
+			else {
+				$fields['state'] = "State required";
+				$error = TRUE;
+			}
 			// checking  travel licence proof is empty or not 
 			if(isset($request_data->tlproof)) {
 				/*if(!v::string()->notEmpty()->validate($request_data->tlproof)) {
