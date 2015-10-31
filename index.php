@@ -2042,7 +2042,65 @@ $app->post(
 	}
 	);
 
+// User validate user coupon code
+$app->post(
+	'/coupon/validate',
+	function () use($app) {
+		$request = \Slim\Slim::getInstance()->request();
+		$request_data = $request->getBody();
+		if(!isJson($request_data)) {
+			$response = array(
+				'error' => 'Invalid JSON',
+				'error_description' => 'Invalid JSON'
+				);
+			$app->response->setStatus(400);
+			echo json_encode($response);
+		}
+		else {
+			$request_data = json_decode($request_data);
+			$fields = array(); // error fields array creation
+			$error = FALSE; // validation error checking variable
+			// checking user id is empty or not 
+			if(isset($request_data->user)) {
+				if(!v::string()->notEmpty()->validate($request_data->user)) {
+					$fields['user'] = "User should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['user'] = "User required";
+				$error = TRUE;
+			}
 
+			// checking coupon code is empty or not 
+			if(isset($request_data->code)) {
+				if(!v::string()->notEmpty()->validate($request_data->code)) {
+					$fields['code'] = "coupon code should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['code'] = "Coupon code required";
+				$error = TRUE;
+			}
+
+			// Checking is validation errors there
+			if($error) {
+				// If any validation errors
+				$response = array(
+					'error' => 'validation',
+					'fields' => $fields
+					);
+				$app->response->setStatus(400);
+				echo json_encode($response);
+			}
+			else {
+				// If no validation errors
+				validate_coupon($app, json_decode($request->getBody()));
+			}
+		}
+	}
+	);
 
 $app->contentType('application/json');
 /**

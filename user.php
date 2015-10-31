@@ -569,4 +569,60 @@ function get_cities($app)
 		$app->response->setStatus(500);
 	}
 }
+
+/*
+ * Check valid coupon code or not.
+ */
+function validate_coupon($app, $data) {
+	$sql = "SELECT roccouponsid FROM roccoupons WHERE roccouponcode = '".$data->code."'";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);
+		$stmt->execute();		
+		$cities_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		$count = count($cities_data);
+		if($count) {
+			valid_user_coupon($app, $data);
+		}
+		else {
+			$status_data = array("result" => "error", "message" => "Invalid coupon code.");
+			echo json_encode($status_data);
+			$app->response->setStatus(400);
+		}
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
+	}
+}
+
+/*
+ * Check valid coupon code for user.
+ */
+function valid_user_coupon($app, $data) {
+	$sql = "SELECT c.roccouponsid FROM roccoupons c, rocusercoupons uc WHERE c.roccouponcode = '".$data->code."' AND uc.rocuserid = '".$data->user."' AND c.roccouponsid = uc.roccouponsid";
+	try {
+		$db = getDB();
+		$stmt = $db->prepare($sql);
+		$stmt->execute();		
+		$cities_data = $stmt->fetchAll(PDO::FETCH_OBJ);
+		$db = null;
+		$count = count($cities_data);
+		if($count) {
+			$status_data = array("result" => "error", "message" => "Invalid coupon code.");
+			echo json_encode($status_data);
+			$app->response->setStatus(400);
+		}
+		else {
+			$status_data = array("result" => "success", "message" => "Valid coupon.");
+			echo json_encode($status_data);
+			$app->response->setStatus(200);
+		}
+	} catch(PDOException $e) {
+	    //error_log($e->getMessage(), 3, '/var/tmp/php.log');
+		echo '{"error":{"message":"'. $e->getMessage() .'"}}'; 
+		$app->response->setStatus(500);
+	}
+}
 ?>
