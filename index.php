@@ -1418,6 +1418,17 @@ $app->put(
 				$fields['state'] = "State required";
 				$error = TRUE;
 			}
+			// checking pincode is empty or not 
+			if(isset($request_data->pincode)) {
+				/*if(!v::string()->notEmpty()->validate($request_data->slocation)) {
+					$fields['slocation'] = "Service Location should not be empty";
+					$error = TRUE;
+				}*/
+			}
+			else {
+				$fields['pincode'] = "Pincode required";
+				$error = TRUE;
+			}
 			// checking  travel licence proof is empty or not 
 			if(isset($request_data->tlproof)) {
 				/*if(!v::string()->notEmpty()->validate($request_data->tlproof)) {
