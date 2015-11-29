@@ -808,7 +808,7 @@ function update_vendorprices($app, $request_data) {
  * get vendor terms and conditions by vendor id
  */
 function get_vendorterms($vendorid) {
-	$sql = "SELECT rocvendortermsid as vtid, rocvendorserviceid as cabservice, roccabmodelid as cabmodel, rocvendorterms as terms FROM rocvendorterms WHERE rocvendorid = :rocvendorid";
+	$sql = "SELECT vt.rocvendortermsid as vtid, vt.rocvendorserviceid as cabserviceid, cs.roccabservices as cabservice, vt.roccabmodelid as cabmodel, vt.rocvendorterms as terms FROM rocvendorterms vt, roccabservices cs WHERE vt.rocvendorserviceid = cs.roccabservicesid AND vt.rocvendorid = :rocvendorid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
