@@ -1815,6 +1815,17 @@ $app->post(
 				$fields['cabmodel'] = "Cab model required";
 				$error = TRUE;
 			}
+			// checking terms cab service is empty or not 
+			if(isset($request_data->cabservice)) {
+				if(!v::string()->notEmpty()->validate($request_data->cabservice)) {
+					$fields['cabservice'] = "Cab service should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['cabservice'] = "Cab service required";
+				$error = TRUE;
+			}
 			// checking terms content is empty or not 
 			if(isset($request_data->content)) {
 				if(!v::string()->notEmpty()->validate($request_data->content)) {
@@ -1894,6 +1905,17 @@ $app->put(
 			}
 			else {
 				$fields['cabmodel'] = "Cab model required";
+				$error = TRUE;
+			}
+			// checking terms cab service is empty or not 
+			if(isset($request_data->cabservice)) {
+				if(!v::string()->notEmpty()->validate($request_data->cabservice)) {
+					$fields['cabservice'] = "Cab service should not be empty";
+					$error = TRUE;
+				}
+			}
+			else {
+				$fields['cabservice'] = "Cab service required";
 				$error = TRUE;
 			}
 			// checking terms content is empty or not 

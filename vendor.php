@@ -808,7 +808,7 @@ function update_vendorprices($app, $request_data) {
  * get vendor terms and conditions by vendor id
  */
 function get_vendorterms($vendorid) {
-	$sql = "SELECT rocvendortermsid as vtid, roccabmodelid as cabmodel, rocvendorterms as terms FROM rocvendorterms WHERE rocvendorid = :rocvendorid";
+	$sql = "SELECT rocvendortermsid as vtid, rocvendorserviceid as cabservice, roccabmodelid as cabmodel, rocvendorterms as terms FROM rocvendorterms WHERE rocvendorid = :rocvendorid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
@@ -831,12 +831,14 @@ function insert_vendorterms($vendorterms) {
 	$vendorterms = json_decode($vendorterms);
 	$vendor_id = $vendorterms->vid;
 	$cabmodel = $vendorterms->cabmodel;
+	$cabservice = $vendorterms->cabservice;
 	$content = $vendorterms->content;
-	$sql = "INSERT INTO rocvendorterms(rocvendorid, roccabmodelid, rocvendorterms) VALUES(:rocvendorid, :roccabmodelid, :rocvendorterms)";
+	$sql = "INSERT INTO rocvendorterms(rocvendorid, rocvendorserviceid, roccabmodelid, rocvendorterms) VALUES(:rocvendorid, :rocvendorserviceid, :roccabmodelid, :rocvendorterms)";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
 		$stmt->bindParam("rocvendorid", $vendor_id);
+		$stmt->bindParam("rocvendorserviceid", $cabservice);
 		$stmt->bindParam("roccabmodelid", $cabmodel);
 		$stmt->bindParam("rocvendorterms", $content);
 		$stmt->execute();
@@ -858,13 +860,15 @@ function update_vendorterms($vendorterms) {
 	$vendor_id = $vendorterms->vid;
 	$term_id = $vendorterms->termid;
 	$cabmodel = $vendorterms->cabmodel;
+	$cabservice = $vendorterms->cabservice;
 	$content = $vendorterms->content;
-	$sql = "UPDATE rocvendorterms SET roccabmodelid =:roccabmodelid, rocvendorterms = :rocvendorterms WHERE rocvendorid = :rocvendorid AND rocvendortermsid = :rocvendortermsid";
+	$sql = "UPDATE rocvendorterms SET roccabmodelid =:roccabmodelid, rocvendorserviceid =:rocvendorserviceid, rocvendorterms = :rocvendorterms WHERE rocvendorid = :rocvendorid AND rocvendortermsid = :rocvendortermsid";
 	try {
 		$db = getDB();
 		$stmt = $db->prepare($sql); 
 		$stmt->bindParam("rocvendorid", $vendor_id);
 		$stmt->bindParam("rocvendortermsid", $term_id);
+		$stmt->bindParam("rocvendorserviceid", $cabservice);
 		$stmt->bindParam("roccabmodelid", $cabmodel);
 		$stmt->bindParam("rocvendorterms", $content);
 		$stmt->execute();
